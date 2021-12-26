@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth; // baru
+use Session;
 
 class RegisterController extends Controller
 {
@@ -29,7 +31,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -41,6 +43,9 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    public function index(){
+		return view('auth.register');
+    }
     /**
      * Get a validator for an incoming registration request.
      *
@@ -50,9 +55,11 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
+            'user_id' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
+            'jabatan' => ['required', 'string', 'max:255'],
+            'peran' => ['required', 'string', 'max:255'],
         ]);
     }
 
@@ -62,12 +69,98 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+    protected function create(Request $request)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $mode = strtolower($request->input("mode"));
+        $form = $request->form;
+        $error = 0;
+        if($mode == 'add'){
+            $cek = User::where('user_id',$request->user_id)->count();
+            if($cek > 0){
+                Session::flash('error', 'User id sudah digunakan!');
+                return redirect()->back();
+            }
+            try {
+                User::create([
+                    'user_id' => $request->user_id,
+                    'nama' => $request->nama,
+                    'password' => md5($request->password),
+                    'jabatan' => $request->jabatan,
+                    'peran' => $request->peran,
+                    'created_at' => date("Y-m-d H:i:s"),
+                ]);
+            }catch(\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add User";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
+                $flashs[] = [
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "User gagal disimpan!",
+                ];
+            } 
+        }else{
+            $cek = User::where('user_id',$request->user_id)->where('password',$request->password_lama)->count();
+            if($cek > 0){
+                Session::flash('error', 'Password lama anda salah!');
+                return redirect()->back();
+            }
+            try {
+                User::where("user_id", $request->user_id)->update([
+                    'nama' => $request->nama,
+                    'password' => md5($request->password),
+                    'jabatan' => $request->jabatan,
+                    'peran' => $request->peran,
+                    'updated_at' => date("Y-m-d H:i:s"),
+                ]);
+            }catch(\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add User";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
+                $flashs[] = [
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "User gagal diupadate!",
+                ];
+            } 
+        }
+        if($error == 0) {
+            if($mode == 'add'){
+                $flashs[] = [
+                    'type' => 'success', // option : info, warning, success, error
+                    'title' => 'Success',
+                    'message' => 'User '.$request->user_id.' telah ditambahkan!',
+                ];
+            }else{
+                $flashs[] = [
+                    'type' => 'success', // option : info, warning, success, error
+                    'title' => 'Success',
+                    'message' => 'User '.$request->user_id.' telah diupdated!',
+                ];
+            }
+        }
+
+        $data["flashs"] = $flashs;
+    	// return redirect()->back()->with($data);
+        if($form == 'formregister'){
+            return redirect()->route('login');
+        }else{
+            return redirect()->back();
+        }
+        
     }
 }

@@ -4,62 +4,43 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth; // baru
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 use Session;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-    }
     public function index(){
 		if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-    	return view('login');
+    	return view('Auth.login');
+    }
+    public function showLoginForm()
+    {
+      return view('Auth.login');
     }
     public function proses_login(Request $request){
-    	request()->validate([
-    		'name' => 'required',
-    		'password' => 'required',
-    	]);
+        $user_id = $request->user_id;
+        $password = $request->password;
+        if(!empty(session('user_id'))) {
+            return redirect()->route('dashboard');
+        }
 
-    	$credentials = $request->only('name','password');
-		Auth::attempt($credentials);
-		if (Auth::check()) {
-			return redirect()->route('dashboard');
-  
+        if(empty($user_id) || empty($password)) {
+            return view('Auth.login');
+        }
+
+        $user = User::where("user_id", '=',$user_id)
+                    ->where("password", '=',md5($password))
+                    ->first();
+        if(!empty($user)) {
+            session(['user_id' => $user->user_id]);
+            return redirect()->route('dashboard');
         } else {
-            Session::flash('error', 'Email atau password salah!');
-            return redirect()->route('login');
+            Session::flash('error', 'User id atau password salah!');
+            return redirect()->back();
         }
     }
     public function logout(Request $request){

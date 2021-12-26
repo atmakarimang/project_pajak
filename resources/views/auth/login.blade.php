@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Pajak | Log in</title>
+  <title>A.K.B.P | Log in</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link rel="icon" href="{{asset('assets/img/LogoKW1.png')}}" sizes="16x16" type="image/png">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/fontawesome-free/css/all.min.css')}}">
   <!-- Ionicons -->
@@ -21,7 +22,7 @@
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <b>Pajak</b> Kita 
+    <img src="{{asset('assets/img/LogoKW1.png')}}" width="46px"> <b>A.K.B.P</b> 
   </div>
   <!-- /.login-logo -->
   <div class="card">
@@ -31,7 +32,7 @@
       <form action="{{url('proses_login')}}" method="post">
         {{ csrf_field() }}
         <div class="input-group mb-3">
-          <input type="text" name ="name" class="form-control" placeholder="Username" required>
+          <input type="text" name ="user_id" class="form-control" placeholder="User ID" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -47,14 +48,6 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="remember">
-              <label for="remember">
-                Remember Me
-              </label>
-            </div>
-          </div>
           <!-- /.col -->
           <div class="col-4">
             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
@@ -62,13 +55,6 @@
           <!-- /.col -->
         </div>
       </form>
-
-      <p class="mb-1">
-        <a href="forgot-password.html">I forgot my password</a>
-      </p>
-      <p class="mb-0">
-        <a href="register.html" class="text-center">Register a new membership</a>
-      </p>
     </div>
     <!-- /.login-card-body -->
   </div>
