@@ -19,5 +19,10 @@ class Pajak extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->pajak = $request->pajak;
+        $data->save();
+        return $data;
+    }
 }
 ?>

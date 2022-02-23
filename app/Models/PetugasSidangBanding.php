@@ -19,5 +19,11 @@ class PetugasSidangBanding extends Model
         $data->save();
         return $data;
     }
+
+    public static function updateDt($request,$data){
+        $data->nama_petugas = $request->nama_petugas;
+        $data->save();
+        return $data;
+    }
 }
 ?>

@@ -19,5 +19,11 @@ class PelaksanaEksekutor extends Model
         $data->save();
         return $data;
     }
+
+    public static function updateDt($request,$data){
+        $data->pelaksana_eksekutor = $request->pel_eksekutor;
+        $data->save();
+        return $data;
+    }
 }
 ?>

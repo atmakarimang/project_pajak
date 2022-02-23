@@ -20,5 +20,11 @@ class AsalPermohonan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->id = $request->kode_pmh;
+        $data->pemohon = $request->pemohon;
+        $data->save();
+        return $data;
+    }
 }
 ?>

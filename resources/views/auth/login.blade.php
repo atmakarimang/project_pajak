@@ -18,8 +18,19 @@
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/dist/css/adminlte.min.css')}}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <style>
+    .login-page {
+      background-image: url("{{asset('assets/img/bg2.png')}}");
+      /* Center and scale the image nicely */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+    } 
+  </style>
 </head>
-<body class="hold-transition login-page">
+
+<body class="hold-transition login-page ">
 <div class="login-box">
   <div class="login-logo">
     <img src="{{asset('assets/img/LogoKW1.png')}}" width="46px"> <b>A.K.B.P</b> 

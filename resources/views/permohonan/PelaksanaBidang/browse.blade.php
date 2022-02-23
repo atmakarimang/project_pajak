@@ -1,4 +1,4 @@
-@section('title','Browse Pelaksana Bidang')
+@section('title','Database Forecaster')
 <!DOCTYPE html>
 <html>
 
@@ -22,7 +22,6 @@
     <script src="{{asset('assets/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{asset('assets/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
   @include('layouts.dashboard.styleSheet')
-
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -36,12 +35,12 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Browse Pelaksana Bidang</h1>
+              <h1 class="m-0 text-dark">Database Forecaster</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Browse Pelaksana Bidang</li>
+                <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Database Forecaster</li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -57,6 +56,10 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                          <a href="{{route('pelaksanabidang.printAll')}}"  id="print" class="btn btn-info">
+                            <i class="fas fa-download"></i> Unduh Excel
+                          </a>
+                          <br><br>
                             <table class="table table-bordered table-hover" id="tabel-pb">
                                 <thead style="text-align:center">                
                                     <tr>
@@ -81,85 +84,55 @@
                 </div>
             </div>
         </div>
-        <script>
-            $('#tabel-pb').DataTable({
-                "paging": true,
-                "ordering": true,
-                "searching": true,
-                "responsive": true,
-                "autoWidth": false,
-                "processing": true,
-                "serverSide": true,
-                "ajax": "{{route('pelaksanabidang.datatablePB')}}",
-                columnDefs: [
-                    {"targets": 0, "orderable": false},
-                    {"targets": 1, "name": 'no_agenda'},
-                    {"targets": 2, "name": 'npwp'},
-                    {"targets": 3, "name": 'nama_wajib_pajak'},
-                    {"targets": 4, "name": 'jenis_permohonan'},
-                    {"targets": 5, "name": 'pajak'},
-                    {"targets": 6, "name": 'no_ketetapan'},
-                    {"targets": 7, "name": 'seksi_konseptor'},
-                    {"targets": 8, "name": 'progress'},
-                    {"targets": 9, "name": 'status'},
-                    {"targets": 10, "orderable": false},
-                ],
-                order: [[ 0, "DESC" ]],
-            });
-            
-            function buttonDelete(data){
-                window.location.href = data.getAttribute('data-link');
-                // swal({   
-                //     title: "Are you sure?",   
-                //     text: "You will not be able to recover this data!",   
-                //     type: "warning",   
-                //     showCancelButton: true,   
-                //     confirmButtonColor: "#DD6B55",   
-                //     confirmButtonText: "Yes",   
-                //     closeOnConfirm: true 
-                // }, function(){
-                //     // window.location.href = data.getAttribute('data-link');
-                // });
-            }
-        </script>
     </section>
     <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
     @include('layouts.dashboard.footer')
-
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-      <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
   @include('layouts.dashboard.javascript')
 </body>
-
 </html>
-@section("script")
+
 <script>
-    console.log("ASS");
-    function buttonDelete(data){
-        console.log("A");
-        swal({   
-            title: "Are you sure?",   
-            text: "You will not be able to recover this data!",   
-            type: "warning",   
-            showCancelButton: true,   
-            confirmButtonColor: "#DD6B55",   
-            confirmButtonText: "Yes",   
-            closeOnConfirm: true 
-        }, function(){
-            window.location.href = data.getAttribute('data-link');
-        });
-    }
-  console.log("A");
-//Date range picker
-    $('.date').datetimepicker({
-        format: 'L'
-    });
-<script>
-@endsection
+  $('#tabel-pb').DataTable({
+    "paging": true,
+    "ordering": true,
+    "searching": true,
+    "responsive": true,
+    "autoWidth": false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": "{{route('pelaksanabidang.datatablePB')}}",
+    columnDefs: [
+      {"targets": 0, "orderable": false},
+      {"targets": 1, "name": 'no_agenda'},
+      {"targets": 2, "name": 'npwp'},
+      {"targets": 3, "name": 'nama_wajib_pajak'},
+      {"targets": 4, "name": 'jenis_permohonan'},
+      {"targets": 5, "name": 'pajak'},
+      {"targets": 6, "name": 'no_ketetapan'},
+      {"targets": 7, "name": 'seksi_konseptor'},
+      {"targets": 8, "name": 'progress'},
+      {"targets": 9, "name": 'status'},
+      {"targets": 10, "orderable": false},
+    ],
+    order: [[ 0, "DESC" ]],
+  });
+            
+  function buttonDelete(data){
+    window.location.href = data.getAttribute('data-link');
+    // swal({   
+    //     title: "Are you sure?",   
+    //     text: "You will not be able to recover this data!",   
+    //     type: "warning",   
+    //     showCancelButton: true,   
+    //     confirmButtonColor: "#DD6B55",   
+    //     confirmButtonText: "Yes",   
+    //     closeOnConfirm: true 
+    // }, function(){
+    //     // window.location.href = data.getAttribute('data-link');
+    // });
+  }
+</script>

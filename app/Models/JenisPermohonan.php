@@ -19,5 +19,10 @@ class JenisPermohonan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->jenis_permohonan = $request->jenis_permohonan;
+        $data->save();
+        return $data;
+    }
 }
 ?>

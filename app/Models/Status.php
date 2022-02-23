@@ -19,5 +19,10 @@ class Status extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->status = $request->status;
+        $data->save();
+        return $data;
+    }
 }
 ?>

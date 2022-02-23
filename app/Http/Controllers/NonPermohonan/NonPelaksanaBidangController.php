@@ -6,15 +6,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth; // baru
 use App\Models\DevError;
-use App\Models\AsalPermohonan;
-use App\Models\JenisPermohonan;
 use App\Models\Pajak;
 use App\Models\Ketetapan;
 use App\Models\NonPelaksanaBidang;
 use App\Models\Status;
-use App\Models\Progress;
 use App\Models\SeksiKonseptor;
-use App\Models\KategoriPermohonan;
+use App\Models\AnggotaSeksi;
 use DB;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -22,8 +19,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
@@ -39,14 +34,9 @@ class NonPelaksanaBidangController extends Controller
         $data = [];
         $user = Auth::user();
         $mode = $request->mode;
-        $dtAsalPermohonan = AsalPermohonan::get();
-        $dtJnsPermohonan = JenisPermohonan::get();
-        $dtPajak = Pajak::get();
-        $dtKetetapan = Ketetapan::get();
-        $dtStatus = Status::get();
-        $dtProgress = Progress::get();
+        $dtStatus = Status::whereIn('status', ['Diarsipkan', 'Ditindaklanjuti', 'Lain - lain'])->get();
         $dtSeksiKonsep = SeksiKonseptor::get();
-        $dtKatPermohonan = KategoriPermohonan::get();
+        $dtKepsek = AnggotaSeksi::get();
         $mode = $request->mode; $data["mode"] = $mode;
         $no_agenda = base64_decode($request->no);$data["no_agenda"] = $no_agenda;
         $dtPB = NonPelaksanaBidang::where('no_agenda','=',$no_agenda)->first();
@@ -57,11 +47,13 @@ class NonPelaksanaBidangController extends Controller
         }
         //set otomatis no agenda
         // 7 digit angka depan = nomor urut, 2 digit angka belakang = tahun P-0000001-21
+        
         $datenow = substr(date('Y'),-2);
-        $maxval = NonPelaksanaBidang::max('no_agenda');
+        $tahun = date('Y');
+        $maxval = NonPelaksanaBidang::where('tahun',$tahun)->max('no');
         $no_agenda = "NP-0000001-".$datenow;
         if($maxval){
-            $noUrut = substr($maxval,2,7);
+            $noUrut = $maxval;
             $noInt = (int)$noUrut;
             $noInt++;
             $no_agenda = "NP-" .str_pad($noInt, 7, "0",  STR_PAD_LEFT)."-".$datenow;
@@ -69,15 +61,10 @@ class NonPelaksanaBidangController extends Controller
         
         $data["mode"] = $mode;
         $data['user'] = $user;
-        $data['dtAsalPermohonan'] = $dtAsalPermohonan;
-        $data['dtJnsPermohonan'] = $dtJnsPermohonan;
-        $data['dtPajak'] = $dtPajak;
-        $data['dtKetetapan'] = $dtKetetapan;
         $data['dtPB'] = $dtPB;
         $data['dtStatus'] = $dtStatus;
-        $data['dtProgress'] = $dtProgress;
         $data['dtSeksiKonsep'] = $dtSeksiKonsep;
-        $data['dtKatPermohonan'] = $dtKatPermohonan;
+        $data['dtKepsek'] = $dtKepsek;
         $data['no_agenda'] = $no_agenda;
 
         return view($this->PATH_VIEW.'index',$data);
@@ -185,9 +172,8 @@ class NonPelaksanaBidangController extends Controller
         
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
-            OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
-            OR pajak like lower('%{$search}%') OR no_ketetapan like lower('%{$search}%')
-            OR seksi_konseptor like lower('%{$search}%') OR progress like lower('%{$search}%') OR status like lower('%{$search}%')";
+            OR nama_wajib_pajak like lower('%{$search}%') OR no_surat like lower('%{$search}%')
+            OR asal_surat like lower('%{$search}%') OR status like lower('%{$search}%')";
             $jumlahFiltered = NonPelaksanaBidang::whereRaw("{$where}") ->count(); //hitung data yang telah terfilter
             if($orderBy !=null){
                 $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
@@ -196,7 +182,8 @@ class NonPelaksanaBidangController extends Controller
             }else{
                 $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
                     ->orWhereNull('status_dokumen')
-                    ->whereRaw($where)->get();
+                    ->whereRaw($where)
+                    ->get();
             }
             
         } else {
@@ -204,39 +191,31 @@ class NonPelaksanaBidangController extends Controller
             if($orderBy !=null){
                 $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
                     ->orWhereNull('status_dokumen')
+                    ->offset($offset)
                     ->limit($limit)->orderBy($orderBy,$orderType)->get();
             }else{
                 $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
                     ->orWhereNull('status_dokumen')
+                    ->offset($offset)
                     ->limit($limit)->get();
             }
         }
         $result = [];
         foreach ($data as $no => $dt) {
-            $linkedit = url('/permohonan/pelaksana-bidang?mode=edit&no='.base64_encode($dt->no_agenda));
-            $linkdelete = url('/permohonan/pelaksana-bidang/delete',base64_encode($dt->no_agenda));
+            $linkedit = url('/nonpermohonan/nonpelaksana-bidang?mode=edit&no='.base64_encode($dt->no_agenda));
+            $linkdelete = url('/nonpermohonan/nonpelaksana-bidang/delete',base64_encode($dt->no_agenda));
             $action = '<center>
                             <a href="'.$linkedit.'">
-                                <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
+                                <button data-toggle="tooltip" title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
                             </a>
-                            <button onclick="buttonDelete(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
-                        </center>';
-            if($dt->progress == 'Final'){
-                $badge = 'badge-success'; 
-            }else if($dt->progress == 'Proses'){
-                $badge = 'badge-primary';
-            }else{
-                $badge = 'badge-info';
-            }
-            $progress = '<center>
-                            <span class="badge '.$badge.'">'.$dt->progress.'</span>
+                            <button onclick="buttonDelete(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
                         </center>';
                         
-             if($dt->status == 'Selesai'){
+             if($dt->status == 'Ditindaklanjuti'){
                 $badge = 'badge-success';
-             }else if($dt->status == 'Tunggakan'){
+             }else if($dt->status == 'Diarsipkan'){
                 $badge = 'badge-danger';
-             }else if($dt->status == 'Kembali'){
+             }else if($dt->status == 'Lain - lain'){
                 $badge = 'badge-warning';
              }else{
                 $badge = 'badge-info';
@@ -245,15 +224,12 @@ class NonPelaksanaBidangController extends Controller
                             <span class="badge '.$badge.'">'.$dt->status.'</span>
                         </center>';
             $result[] = [
-                $no+1,
+                $start + $no+1,
                 $dt->no_agenda,
+                $dt->no_surat,
+                $dt->asal_surat,
                 $dt->npwp,
                 $dt->nama_wajib_pajak,
-                $dt->jenis_permohonan,
-                $dt->pajak,
-                $dt->no_ketetapan,
-                $dt->seksi_konseptor,
-                $progress,
                 $status,
                 $action,
             ];
@@ -273,7 +249,7 @@ class NonPelaksanaBidangController extends Controller
         return redirect()->back();
     }
 
-    public function print($no_agenda,$docExt){
+    public function print($no_agenda){
         $noagen = base64_decode($no_agenda);
         $data = NonPelaksanaBidang::where('no_agenda','=',$noagen)->first();
         if(!$data){
@@ -282,27 +258,10 @@ class NonPelaksanaBidangController extends Controller
             return redirect()->back();
         }
         $spreadsheet = new Spreadsheet();
-        dd($spreadsheet);
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->getPageSetup()->setFitToWidth(1);
         $sheet->getPageSetup()->setFitToHeight(0);
-        $logo = storage_path().'/app/'.$company->LOGO;
 
-        //header
-        $sheet->mergeCells("A1:C1");
-        $sheet->mergeCells("I1:J1");
-
-        $objDrawing1 = new Drawing();
-        $objDrawing1->setName('Sample image');
-        $objDrawing1->setDescription('Sample image');
-        $objDrawing1->setPath($logo);
-
-        $objDrawing1->setHeight(64);
-        $objDrawing1->setCoordinates("A1");
-        $objDrawing1->setWorksheet($sheet);
-
-        $sheet->getRowDimension('1')->setRowHeight(64);
-        $sheet->setCellValue('I1', 'Sales Order');
         $fontTitle = [
             'font' => [
                 'bold' => true,
@@ -311,7 +270,6 @@ class NonPelaksanaBidangController extends Controller
                 'vertical' => Alignment::VERTICAL_CENTER,
             ]
         ];
-        $sheet->getStyle('I1')->applyFromArray($fontTitle);
 
         $styleArray = [
             'borders' => [
@@ -320,5 +278,78 @@ class NonPelaksanaBidangController extends Controller
                 ],
             ],
         ];
+
+        $sheet->getColumnDimension('A')->setWidth(21);
+        $sheet->getColumnDimension('B')->setWidth(21);
+        $sheet->getColumnDimension('C')->setWidth(21);
+        $sheet->getColumnDimension('D')->setWidth(21);
+        $sheet->getColumnDimension('E')->setWidth(21);
+        $sheet->getColumnDimension('F')->setWidth(21);
+        $sheet->getColumnDimension('G')->setWidth(21);
+        $sheet->getColumnDimension('H')->setWidth(21);
+        $sheet->getColumnDimension('I')->setWidth(16);
+        $sheet->getColumnDimension('J')->setWidth(16);
+        $sheet->getColumnDimension('K')->setWidth(16);
+        $sheet->getColumnDimension('L')->setWidth(16);
+        $sheet->getColumnDimension('M')->setWidth(16);
+
+        $sheet->setCellValue('A1', 'No Agenda');
+        $sheet->setCellValue('B1', 'Tanggal Agenda');
+        $sheet->setCellValue('C1', 'Nomor Surat');
+        $sheet->setCellValue('D1', 'Tanggal Surat');
+        $sheet->setCellValue('E1', 'Tanggal diterima Kanwil');
+        $sheet->setCellValue('F1', 'Asal Surat');
+        $sheet->setCellValue('G1', 'Hal');
+        $sheet->setCellValue('H1', 'Nomor Pokok Wajib Pajak');
+        $sheet->setCellValue('I1', 'Nama Wajib Pajak');
+        $sheet->setCellValue('J1', 'Seksi Konseptor');
+        $sheet->setCellValue('K1', 'Kepala Seksi');
+        $sheet->setCellValue('L1', 'Penerima Disposisi');
+        $sheet->setCellValue('M1', 'Status');
+
+        $spreadsheet->getActiveSheet()->getStyle('A1:M1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:M1')->applyFromArray($fontTitle);
+        $sheet->getRowDimension('4')->setRowHeight(20);
+
+        $sheet->setCellValue('A2', $data->no_agenda);
+        $sheet->setCellValue('B2', $data->tgl_agenda);
+        $sheet->setCellValue('C2', $data->no_surat);
+        $sheet->setCellValue('D2', date("d-m-Y",strtotime($data->tgl_surat)));
+        $sheet->setCellValue('E2', date("d-m-Y",strtotime($data->tgl_diterima_kanwil)));
+        $sheet->setCellValue('F2', $data->asal_surat);
+        $sheet->setCellValue('G2', $data->hal);
+        $sheet->setCellValue('H2', $data->npwp);
+        $sheet->setCellValue('I2', $data->nama_wajib_pajak);
+        $sheet->setCellValue('J2', $data->seksi_konseptor);
+        $sheet->setCellValue('K2', $data->kepala_seksi);
+        $sheet->setCellValue('L2', $data->penerima_disposisi);
+        $sheet->setCellValue('M2', $data->status);
+        
+        $header_style_border = [
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => [
+                        'argb' => 'FFFFFFFF'
+                    ]
+                ]
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FF000080',
+                ],
+            ]
+        ];
+        $sheet->getStyle('A1:M1')->applyFromArray($header_style_border);
+        header("Content-Description: File Transfer");
+        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang '.$noagen.'.xls');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Expires: 0');
+        $writer = new Xls($spreadsheet);
+        $writer->save("php://output");
+        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang '.$noagen.'.xls');
     }
 }

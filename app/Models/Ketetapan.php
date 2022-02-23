@@ -19,5 +19,10 @@ class Ketetapan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->jenis_ketetapan = $request->jenis_ketetapan;
+        $data->save();
+        return $data;
+    }
 }
 ?>

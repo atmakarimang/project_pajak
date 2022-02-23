@@ -19,5 +19,10 @@ class Keputusan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->keputusan = $request->keputusan;
+        $data->save();
+        return $data;
+    }
 }
 ?>

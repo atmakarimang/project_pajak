@@ -19,5 +19,10 @@ class KategoriPermohonan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->kat_permohonan = $request->kat_pemohon;
+        $data->save();
+        return $data;
+    }
 }
 ?>

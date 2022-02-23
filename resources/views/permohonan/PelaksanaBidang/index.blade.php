@@ -1,4 +1,4 @@
-@section('title','Pelaksana Bidang')
+@section('title','Forecaster')
 <!DOCTYPE html>
 <html>
 
@@ -9,19 +9,16 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- daterange picker -->
-  <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/daterangepicker/daterangepicker.css')}}">
   <script src="{{asset('assets/AdminLTE/plugins/jquery/jquery.min.js')}}"></script>
   <script src="{{asset('assets/AdminLTE/plugins/jquery/jquery.js')}}"></script>
-  <!-- Bootstrap 4 -->
-  <script src="{{asset('assets/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-  <!-- Tempusdominus Bbootstrap 4 -->
-  <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')}}">
-  <!-- InputMask -->
-  <script src="{{asset('assets/AdminLTE/plugins/moment/moment.min.js')}}"></script>
-  <!-- date-range-picker -->
-  <script src="{{asset('assets/AdminLTE/plugins/daterangepicker/daterangepicker.js')}}"></script>
-  <!-- Tempusdominus Bootstrap 4 -->
-  <script src="{{asset('assets/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js')}}"></script>
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2/css/select2.min.css')}}">
+  <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+ 
+  <link href="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css">
+  <!-- datetime picker -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.4/css/bootstrap-datetimepicker.min.css"/>
   @include('layouts.dashboard.styleSheet')
 </head>
 
@@ -36,12 +33,12 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Form Pelaksana Bidang</h1>
+              <h1 class="m-0 text-dark">Forecaster</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Pelaksana Bidang</li>
+                <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Forecaster</li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -53,7 +50,7 @@
       
     <div class="col-md-12">
       <a href="{{route('pelaksanabidang.browse')}}">
-        <button class="btn btn-success float-left"><i class="fa fa-search"></i> Browse Pelaksana Bidang</button>
+        <button class="btn btn-success float-left"><i class="fa fa-search"></i> Database Permohonan</button>
       </a>
     </div>  
     <br><br>
@@ -64,7 +61,7 @@
                 <div class="col-md-12">
                   <div class="card card-primary">
                     <div class="card-header">
-                      <h3 class="card-title">General</h3>
+                      <h3 class="card-title">Forecaster</h3>
                       <div class="card-tools">
                           <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                           <i class="fas fa-minus"></i></button>
@@ -84,18 +81,18 @@
                         </div>
                         <div class="col-6">
                           <label>Tanggal Agenda</label>
-                            <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                            <div class="input-group">
                               @if(!empty($dtPB->tgl_agenda))
                                 @php
-                                  $tgl = date('d/m/Y', strtotime($dtPB->tgl_agenda));
+                                  $tgl = date('d-m-Y', strtotime($dtPB->tgl_agenda));
                                 @endphp
-                                <input type="text" class="form-control" data-target="#tgl_agenda" name="tgl_agenda" value="{{$tgl}}" required readonly/>
+                                <input type="text" class="form-control" name="tgl_agenda" value="{{$tgl}}" required readonly/>
                               @else
-                                <input type="text" name="tgl_agenda" class="form-control datetimepicker-input" data-target="#reservationdate" required/>
-                                <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                </div>
+                                <input type="text" name="tgl_agenda" class="form-control datetimepicker-input datenya" name="tgl_agenda[]" required/>
                               @endif
+                              <div class="input-group-append" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                              </div>
                           </div>
                         </div>
                       </div>
@@ -113,21 +110,18 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal Naskah Dinas</label>
-                              <div class="input-group date" id="agendadate" data-target-input="nearest">
+                              <div class="input-group">
                                 @if(!empty($dtPB->tgl_naskah_dinas))
                                   @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_naskah_dinas));
+                                    $tgl = date('d-m-Y', strtotime($dtPB->tgl_naskah_dinas));
                                   @endphp
-                                  <input type="text" name="tgl_naskahdinas" class="form-control date" data-target="#tgl_naskahdinas" value="{{$tgl}}" required/>
-                                  <div class="input-group-append" data-target="#tgl_naskahdinas" data-toggle="datetimepicker">
-                                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                  </div>
+                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
                                 @else
-                                  <input type="text" name="tgl_naskahdinas" class="form-control date" data-target="#tgl_naskahdinas" required/>
-                                  <div class="input-group-append" data-target="#tgl_naskahdinas" data-toggle="datetimepicker">
-                                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                  </div>
+                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya" required/>
                                 @endif
+                                <div class="input-group-append">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
                               </div>
                           </div>
                         </div>
@@ -136,7 +130,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="asal_permohonan">Asal Permohonan</label>
-                            <select class="form-control select2" name="asal_permohonan" required>
+                            <select class="form-control select2bs4" name="asal_permohonan" required>
                                 <option selected disabled>Pilih Asal Permohonan</option>
                                 @foreach($dtAsalPermohonan as $dt)
                                   <option value="{{$dt->pemohon}}" {{ ($dt->pemohon==$dtPB->pemohon) ? "selected" : "" }}>{{$dt->id}} {{$dt->pemohon}}</option>
@@ -159,36 +153,36 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal diterima KPP</label>
-                              <div class="input-group date" id="tgl_in_kpp" data-target-input="nearest">
+                              <div class="input-group">
                                 @if(!empty($dtPB->tgl_diterima_kpp))
                                   @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_diterima_kpp));
+                                    $tgl = date('d-m-Y', strtotime($dtPB->tgl_diterima_kpp));
                                   @endphp
-                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input" data-target="#tgl_in_kpp" value="{{$tgl}}" required/>
+                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
                                 @else
-                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input" data-target="#tgl_in_kpp" required/>
-                                  <div class="input-group-append" data-target="#tgl_in_kpp" data-toggle="datetimepicker">
-                                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                  </div>
+                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya" required/>
                                 @endif
+                                <div class="input-group-append">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
                               </div>
                           </div>
                         </div>
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal diterima Kanwil</label>
-                              <div class="input-group date" id="tgl_in_kanwil" data-target-input="nearest">
+                              <div class="input-group">
                                 @if(!empty($dtPB->tgl_diterima_kanwil))
                                   @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_diterima_kanwil));
+                                    $tgl = date('d-m-Y', strtotime($dtPB->tgl_diterima_kanwil));
                                   @endphp
-                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input" data-target="#tgl_in_kanwil" value="{{$tgl}}" required/>
+                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
                                 @else
-                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input" data-target="#tgl_in_kanwil" required/>
-                                  <div class="input-group-append" data-target="#tgl_in_kanwil" data-toggle="datetimepicker">
-                                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                  </div>
+                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya" required/>
                                 @endif
+                                <div class="input-group-append">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
                               </div>
                           </div>
                         </div>
@@ -200,7 +194,7 @@
                             @if(!empty($dtPB->npwp))
                               <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dtPB->npwp}}" required>
                             @else
-                              <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" required>
+                              <input type="text" id="no_npwp" name="no_npwp" class="form-control" required>
                             @endif
                           </div>
                         </div>
@@ -219,7 +213,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_permohonan">Jenis Permohonan</label>
-                            <select class="form-control select2" name="jenis_permohonan" required>
+                            <select class="form-control select2bs4" name="jenis_permohonan" required>
                                 <option selected disabled>Pilih Jenis Permohonan</option>
                                 @foreach($dtJnsPermohonan as $dt)
                                   <option value="{{$dt->jenis_permohonan}}" {{ ($dt->jenis_permohonan==$dtPB->jenis_permohonan) ? "selected" : "" }}>{{$dt->jenis_permohonan}}</option>
@@ -230,7 +224,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_pajak">Jenis Pajak</label>
-                            <select class="form-control select2" name="jenis_pajak" required>
+                            <select class="form-control select2bs4" name="jenis_pajak" required>
                                 <option selected disabled>Pilih Jenis Pajak</option>
                                 @foreach($dtPajak as $dt)
                                   <option value="{{$dt->pajak}}" {{ ($dt->pajak==$dtPB->pajak) ? "selected" : "" }}>{{$dt->pajak}}</option>
@@ -243,7 +237,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_ketetapan">Jenis Ketetapan</label>
-                            <select class="form-control select2" name="jenis_ketetapan" required>
+                            <select class="form-control select2bs4" name="jenis_ketetapan" required>
                                 <option selected disabled>Pilih Jenis Ketetapan</option>
                                 @foreach($dtKetetapan as $dt)
                                   <option value="{{$dt->jenis_ketetapan}}" {{ ($dt->jenis_ketetapan==$dtPB->jenis_ketetapan) ? "selected" : "" }}>{{$dt->jenis_ketetapan}}</option>
@@ -257,7 +251,7 @@
                             @if(!empty($dtPB->no_ketetapan))
                               <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" placeholder="XXXXX/XXX/XX/XXX/XX" value="{{$dtPB->no_ketetapan}}" required>
                             @else
-                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" placeholder="XXXXX/XXX/XX/XXX/XX" required>
+                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" required>
                             @endif
                           </div>
                         </div>
@@ -266,25 +260,25 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal Ketetapan</label>
-                            <div class="input-group date" id="tgl_ketetapan" data-target-input="nearest">
+                            <div class="input-group">
                               @if(!empty($dtPB->tgl_ketetapan))
-                                  @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_ketetapan));
-                                  @endphp
-                                  <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input" data-target="#tgl_ketetapan" value="{{$tgl}}" required/>
+                                @php
+                                  $tgl = date('d-m-Y', strtotime($dtPB->tgl_ketetapan));
+                                @endphp
+                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
                               @else
-                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input" data-target="#tgl_ketetapan" required/>
-                                <div class="input-group-append" data-target="#tgl_ketetapan" data-toggle="datetimepicker">
-                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                </div>
+                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" required/>
                               @endif
+                              <div class="input-group-append">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                              </div>
                             </div>
                           </div>
                         </div>
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_ketetapan">Masa Pajak</label>
-                            <select class="form-control select2" name="masa_pajak" required>
+                            <select class="form-control select2bs4" name="masa_pajak" required>
                                 <option selected disabled>Pilih Masa Pajak</option>
                                 <option value="Januari" {{ ($dtPB->masa_pajak == 'Januari') ? "selected" : "" }}>Januari</option>
                                 <option value="Februari" {{ ($dtPB->masa_pajak == 'Februari') ? "selected" : "" }}>Februari</option>
@@ -307,16 +301,16 @@
                           <div class="form-group">
                             <label for="tahun_pajak">Tahun Pajak</label>
                             @if(!empty($dtPB->tahun_pajak))
-                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control" value="{{$dtPB->tahun_pajak}}" required>
+                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" value="{{$dtPB->tahun_pajak}}" required>
                             @else
-                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control" required>
+                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" required>
                             @endif
                           </div>
                         </div>
                         <div class="col-6">
                           <div class="form-group">
                             <label for="kat_permohonan">Kategori Permohonan</label>
-                            <select class="form-control select2" name="kat_permohonan" required>
+                            <select class="form-control" name="kat_permohonan" required>
                                 <option selected disabled>Pilih Kategori Permohonan</option>
                                 @foreach($dtKatPermohonan as $dt)
                                   <option value="{{$dt->kat_permohonan}}" {{ ($dtPB->kat_permohonan == $dt->kat_permohonan) ? "selected" : "" }}>{{$dt->kat_permohonan}}</option>
@@ -339,18 +333,18 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal Surat Permohonan</label>
-                            <div class="input-group date" id="tgl_srtper" data-target-input="nearest">
+                            <div class="input-group">
                               @if(!empty($dtPB->tgl_srt_permohonan))
-                                  @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_srt_permohonan));
-                                  @endphp
-                                  <input type="text" name="tgl_srtper" class="form-control datetimepicker-input" data-target="#tgl_srtper" value="{{$dtPB->tgl_srt_permohonan}}" required/>
+                                @php
+                                  $tgl = date('d-m-Y', strtotime($dtPB->tgl_srt_permohonan));
+                                @endphp
+                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
                               @else
-                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input" data-target="#tgl_srtper" required/>
-                                <div class="input-group-append" data-target="#tgl_srtper" data-toggle="datetimepicker">
-                                  <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                </div>
+                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" required/>
                               @endif
+                              <div class="input-group-append">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -380,7 +374,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="status">Status</label>
-                            <select class="form-control select2" name="status" required>
+                            <select class="form-control" name="status" required>
                               @foreach($dtStatus as $dt)
                                 <option value="{{$dt->status}}" {{ ($dtPB->status == $dt->status) ? "selected" : " " }}>{{$dt->status}}</option>
                               @endforeach
@@ -392,7 +386,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="progress">Progress</label>
-                            <select class="form-control select2" name="progress" required>
+                            <select class="form-control" name="progress" required>
                               @foreach($dtProgress as $dt)
                                 <option value="{{$dt->progress}}" {{ ($dtPB->progress == $dt->progress) ? "selected" : " " }}>{{$dt->progress}}</option>
                               @endforeach
@@ -403,9 +397,9 @@
                           <div class="form-group">
                             <label for="jumlah_bayar">Jumlah Pembayaran a/ PMK-29 & PMK-91</label>
                             @if(!empty($dtPB->jumlah_byr_pmk))
-                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" value="{{$dtPB->jumlah_byr_pmk}}" required>
+                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" value="{{$dtPB->jumlah_byr_pmk}}">
                             @else
-                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" required>
+                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control">
                             @endif
                           </div>
                         </div>
@@ -414,39 +408,32 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label>Tanggal Pembayaran</label>
-                            <div class="input-group date" id="tgl_bayar" data-target-input="nearest">
+                            <div class="input-group">
                               @if(!empty($dtPB->tgl_byr_pmk))
-                                  @php
-                                    $tgl = date('d/m/Y', strtotime($dtPB->tgl_byr_pmk));
-                                  @endphp
-                                  <input type="text" name="tgl_bayar" class="form-control datetimepicker-input" data-target="#tgl_bayar" value="{{$tgl}}" required/>
+                                @php
+                                  $tgl = date('d-m-Y', strtotime($dtPB->tgl_byr_pmk));
+                                @endphp
+                                <input type="text" name="tgl_bayar" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                               @else
-                                <input type="text" name="tgl_bayar" class="form-control datetimepicker-input" data-target="#tgl_bayar" required/>
-                                <div class="input-group-append" data-target="#tgl_bayar" data-toggle="datetimepicker">
-                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                </div>
+                                <input type="text" name="tgl_bayar" class="form-control datetimepicker-input datenya"/>
                               @endif
+                              <div class="input-group-append">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div class="col-3">
-                          <div class="card-footer">
+                        <div class="col-6">
+                          <div class="card-footer hideread">
                             @if($mode=='edit')
-                              <button type="submit" name="mode" class="btn btn-success float-left" value="edit">Update</button>
+                              <button type="submit" name="mode" class="btn btn-success float-left submit" value="edit">Update</button>
                               &nbsp;&nbsp;&nbsp;&nbsp;
-                              <div class="btn-group">
-                                <button type="button" class="btn btn-info">Print</button>
-                                <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                  <span class="sr-only">Toggle Dropdown</span>
-                                  <div class="dropdown-menu" role="menu">
-                                    <a class="dropdown-item" href='{{route("pelaksanabidang.print", [base64_encode($dtPB->no_agenda), "xls"])}}'>.xls</a>
-                                    <a class="dropdown-item" href='{{route("pelaksanabidang.print", [base64_encode($dtPB->no_agenda), "xlsx"])}}'>.xlsx</a>
-                                  </div>
-                                </button>
-                            </div>
+                              <a href="{{route("pelaksanabidang.print", base64_encode($dtPB->no_agenda))}}"  id="print" class="btn btn-info">
+                                <i class="fas fa-download"></i> Unduh Excel
+                              </a>
                             @else
-                              <button type="submit" name="mode" class="btn btn-success float-left" value="add">Add</button>
-                              <button type="submit" class="btn btn-default float-right">Cancel</button>
+                              <button type="submit" name="mode" class="btn btn-success float-left submit" value="add">Add</button>
+                              &nbsp &nbsp<button type="reset" class="btn btn-default reset">Reset</button>
                             @endif
                           </div>
                         </div>
@@ -458,24 +445,6 @@
                 </div>
             </div>
         </form>
-        <script>
-          console.log("AS");
-          //Date range picker
-            $('#reservationdate').datetimepicker({
-                format: 'L'
-            });
-            //Date range picker
-            $('#reservation').daterangepicker()
-            //Date range picker with time picker
-            $('#reservationtime').daterangepicker({
-              timePicker: true,
-              timePickerIncrement: 30,
-              locale: {
-                format: 'MM/DD/YYYY hh:mm A'
-              }
-            })
-            
-        </script>
     </section>
     <!-- /.content -->
     </div>
@@ -493,8 +462,69 @@
 </body>
 
 </html>
-@section("script")
+<script src="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+<!-- InputMask -->
+<script src="{{asset('assets/AdminLTE/plugins/moment/moment.min.js')}}"></script>
+<script src="{{asset('assets/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.4/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css"></script>
+
+<!-- Bootstrap 4 -->
+<script src="{{asset('assets/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+<!-- Select2 -->
+<script src="{{asset('assets/AdminLTE/plugins/select2/js/select2.full.min.js')}}"></script>
+
 <script>
-  alert('AH')
+  $(function () {
+    // XX.XXX.XXX.X-XXX.XXX
+    $('#no_npwp').mask("00.000.000.0-000.000", {placeholder: "__.__.___.___._-___.___"});
+    // XXXXX/XXX/XX/XXX/XX
+    $('#no_ketetapan').mask("00000/000/00/000/00", {placeholder: "_____/___/__/___/__"});
+    var cekuser = "{{$user->peran}}";
+    if (cekuser == 'Forecaster'){
+      $('.form-control, .submit, .reset, .form-check-input').prop('disabled',false);
+    }else if(cekuser == 'Eksekutor'){
+      $('.form-control, .submit, .reset, .form-check-input').prop('disabled',true);
+      $('#print').css('pointer-events','none');
+    }
+
+    //Disabled form jk open dari Laporan
+    var params = new window.URLSearchParams(window.location.search);
+    var isreadonly = params.get('readonly');
+    if(isreadonly == 1){
+      $("input:not(#top_bar_search)").prop('disabled', true);
+      $(".btn, .form-control").attr("disabled", true);
+      $('.hideread').hide();
+    }
+
+    $('.select2').select2();
+    $('.select2bs4').select2({
+        theme: 'bootstrap4'
+    });
+    $('.datenya').datepicker({
+      autoclose: true,
+      todayHighlight: true,
+      format: 'dd-mm-yyyy'
+    });
+    $('.year').datepicker({
+      minViewMode: 2,
+      format: 'yyyy'
+    });
+    $('#jumlah_bayar').inputmask("decimal", {
+      radixPoint: ".",
+      groupSeparator: ".",
+      // digits: 2,
+      autoGroup: true,
+      prefix: '', //Space after $, this will not truncate the first character.
+      rightAlign: false,
+      autoUnmask: true
+    });
+    // if ($('input:checkbox').filter(':checked').length < 1){
+    //     alert("Pilih seksi konseptor!");
+    //   return false;
+    // }
+  });
 </script>
-@endsection

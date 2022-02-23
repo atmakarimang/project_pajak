@@ -1,4 +1,4 @@
-@section('title','Form Data Pajak')
+@section('title','Data Pajak')
 <!DOCTYPE html>
 <html>
 
@@ -22,11 +22,11 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Form Data Pajak</h1>
+              <h1 class="m-0 text-dark">Data Pajak</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
                 <li class="breadcrumb-item active">Data Pajak</li>
               </ol>
             </div><!-- /.col -->
@@ -44,7 +44,7 @@
                         <h3 class="card-title">Pajak</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i class="fas fa-minus"></i></button>
+                            <!-- <i class="fas fa-minus"></i></button> -->
                         </div>
                     </div>
                     <form id="form-permohonan" data-toggle="validator" action="{{route('pajak.storePajak')}}" method="POST" enctype="multipart/form-data">
@@ -52,27 +52,25 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="pajak">Jenis Pajak</label>
+                                <input type="hidden" id="id_pj" name="id_pj" class="form-control">
                                 <input type="text" id="pajak" name="pajak" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            @if($mode=='edit')
-                                <button type="submit" name="mode" class="btn btn-info" value="edit">Update</button>
-                            @else
-                                <button type="submit" name="mode" class="btn btn-info" value="add">Add</button>
-                            @endif
+                            <button type="submit" id="button-submit-add1" name="mode" class="btn btn-primary" value="add">Add</button>
+                            <button type="submit" id="button-submit-edit1" class="btn btn-primary" name="mode" value="edit" style="display: none">Update</button>
                         </div>   
                     </form>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card card-success">
+                <div class="card card-info">
                     <div class="card-header">
                         <h3 class="card-title">Ketetapan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i class="fas fa-minus"></i></button>
+                            <!-- <i class="fas fa-minus"></i></button> -->
                         </div>
                     </div>
                     <form id="form-jp" data-toggle="validator" action="{{route('pajak.storeJK')}}" method="POST" enctype="multipart/form-data">
@@ -80,16 +78,14 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="jenis_ketetapan">Jenis Ketetapan</label>
+                                <input type="hidden" id="id_jk" name="id_jk" class="form-control">
                                 <input type="text" id="jenis_ketetapan" name="jenis_ketetapan" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            @if($mode=='edit')
-                                <button type="submit" name="mode" class="btn btn-info" value="edit">Update</button>
-                            @else
-                                <button type="submit" name="mode" class="btn btn-info" value="add">Add</button>
-                            @endif
+                            <button type="submit" id="button-submit-add2" name="mode" class="btn btn-info" value="add">Add</button>
+                            <button type="submit" id="button-submit-edit2" class="btn btn-info" name="mode" value="edit" style="display: none">Update</button>
                         </div>   
                     </form>
                 </div>
@@ -97,51 +93,55 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-primary">
+                <div class="card card-primary collapsed-card">
                     <div class="card-header">
-                        <h3 class="card-title">Browse Asal Permohonan</h3>
+                        <h3 class="card-title">Browse Pajak</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i class="fas fa-minus"></i></button>
+                            <i class="fas fa-plus"></i></button>
                         </div>
                     </div>
-                    <div class="card-body p-0" id="kepsek_datatable">
-                        <table class="table" id="table-kepsek">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Kode</th>
-                                    <th>Pemohon</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <form id="form-seksi-konseptor" data-toggle="validator" action="" method="POST" enctype="multipart/form-data">
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Browse Jenis Permohonan</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body p-0" id="konseptor_datatable">
-                            <table class="table" id="table-konseptor">
+                    <div class="card-body p-0" id="ap_datatable">
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover" id="table-ap">
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Jenis Permohonan</th>
+                                        <th>Jenis Pajak</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <form id="form-seksi-konseptor" data-toggle="validator" action="" method="POST" enctype="multipart/form-data">
+                    <div class="card card-info collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Browse Ketetapan</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0" id="jp_datatable">
+                            <div class="card-body">
+                                <table class="table table-bordered table-hover" id="table-jp">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Ketetapan</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -164,34 +164,82 @@
 </body>
 
 </html>
-@section("script")
 <script>
-    jQuery(document).ready(function(){
-        console.log("AA");
-        if($('#table-kepsek tbody .dataTables_empty').length){
-            $('#table-kepsek, #kepsek_datatable').hide();
-        }
-        $('#table-kepsek').DataTable({
-            "processing": true,
-            "responsive" : true,
-            "serverSide": true,
-            "bDestroy": true,
-            "orderable":false,
-            ajax:{
-                url : "{{route('seksi.ajaxDataKepsek')}}",
-                type : "POST",
-                data : function(d){
-                    console.log(d);
-                    d._token = "{{ csrf_token() }}";
-                }
+    $('#table-ap').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "autoWidth": false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": "{{route('pajak.ajaxDataPajak')}}",
+        columnDefs: [
+            {"targets": 0, "orderable": false},
+            {"targets": 1, "name": 'pajak'},
+            {"targets": 2, "orderable": false},
+        ],
+        order: [[ 0, "DESC" ]],
+    });
+    function editPj(id) {
+        $.ajax({
+            method: 'GET',
+            url: "{{route('pajak.editPj')}}",
+            data : {
+                'id' : id
             },
-            columnDefs: [
-                {"targets": 0, "orderable": false},
-                {"targets": 1, "name": 'nama_anggota'},
-                {"targets": 2, "orderable": false},            
-            ],
-            order: [[ 0, "DESC" ]],
-        });
-    })
-<script>
-@endsection
+            dataType: 'JSON',
+            success: function(data) {
+                $('#id_pj').val(data.id);
+                $('#pajak').val(data.pajak);
+                $('#button-submit-add1').css('display','none');
+                $('#button-submit-edit1').css('display','block');
+            },
+            fail: function(notifHTML){
+                alert("loh");
+            }
+        }); 
+    }
+    function buttonDeletePj(data){
+        window.location.href = data.getAttribute('data-link');
+    }
+
+    $('#table-jp').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "autoWidth": false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": "{{route('pajak.ajaxDataJK')}}",
+        columnDefs: [
+            {"targets": 0, "orderable": false},
+            {"targets": 1, "name": 'jenis_ketetapan'},
+            {"targets": 2, "orderable": false},
+        ],
+        order: [[ 0, "DESC" ]],
+    });
+    function editJk(id) {
+        $.ajax({
+            method: 'GET',
+            url: "{{route('pajak.editJk')}}",
+            data : {
+                'id' : id
+            },
+            dataType: 'JSON',
+            success: function(data) {
+                $('#id_jk').val(data.id);
+                $('#jenis_ketetapan').val(data.jenis_ketetapan);
+                $('#button-submit-add2').css('display','none');
+                $('#button-submit-edit2').css('display','block');
+            },
+            fail: function(notifHTML){
+                alert("loh");
+            }
+        }); 
+    }
+    function buttonDeleteJk(data){
+        window.location.href = data.getAttribute('data-link');
+    }
+</script>

@@ -19,5 +19,10 @@ class SeksiKonseptor extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->seksi_konseptor = $request->seksi_konseptor;
+        $data->save();
+        return $data;
+    }
 }
 ?>

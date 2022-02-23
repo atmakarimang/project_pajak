@@ -19,5 +19,10 @@ class Progress extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->progress = $request->progress;
+        $data->save();
+        return $data;
+    }
 }
 ?>

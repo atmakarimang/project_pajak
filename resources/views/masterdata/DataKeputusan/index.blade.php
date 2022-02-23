@@ -1,4 +1,4 @@
-@section('title','Form Data Keputusan')
+@section('title','Data Keputusan')
 <!DOCTYPE html>
 <html>
 
@@ -22,11 +22,11 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Form Data Keputusan</h1>
+              <h1 class="m-0 text-dark">Data Keputusan</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
                 <li class="breadcrumb-item active">Data Keputusan</li>
               </ol>
             </div><!-- /.col -->
@@ -44,24 +44,22 @@
                         <h3 class="card-title">Data Keputusan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i class="fas fa-minus"></i></button>
+                            <!-- <i class="fas fa-minus"></i></button> -->
                         </div>
                     </div>
-                    <form id="form-status" data-toggle="validator" action="{{route('keputusan.store')}}" method="POST" enctype="multipart/form-data">
+                    <form id="form-status" data-toggle="validator" action="{{route('keputusan.storeKep')}}" method="POST" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="keputusan">Keputusan</label>
+                                <input type="hidden" id="id_kep" name="id_kep" class="form-control">
                                 <input type="text" id="keputusan" name="keputusan" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            @if($mode=='edit')
-                                <button type="submit" name="mode" class="btn btn-info" value="edit">Update</button>
-                            @else
-                                <button type="submit" name="mode" class="btn btn-info" value="add">Add</button>
-                            @endif
+                            <button type="submit" id="button-submit-add1" name="mode" class="btn btn-primary" value="add">Add</button>
+                            <button type="submit" id="button-submit-edit1" class="btn btn-primary" name="mode" value="edit" style="display: none">Update</button>
                         </div>   
                     </form>
                 </div>
@@ -69,26 +67,28 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-primary">
+                <div class="card card-primary collapsed-card">
                     <div class="card-header">
                         <h3 class="card-title">Browse Keputusan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i class="fas fa-minus"></i></button>
+                            <i class="fas fa-plus"></i></button>
                         </div>
                     </div>
-                    <div class="card-body p-0" id="kepsek_datatable">
-                        <table class="table" id="table-kepsek">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Keputusan</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    <div class="card-body p-0" id="kep_datatable">
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover" id="table-kep">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Keputusan</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,34 +110,43 @@
 </body>
 
 </html>
-@section("script")
 <script>
-    jQuery(document).ready(function(){
-        console.log("AA");
-        if($('#table-kepsek tbody .dataTables_empty').length){
-            $('#table-kepsek, #kepsek_datatable').hide();
-        }
-        $('#table-kepsek').DataTable({
-            "processing": true,
-            "responsive" : true,
-            "serverSide": true,
-            "bDestroy": true,
-            "orderable":false,
-            ajax:{
-                url : "{{route('seksi.ajaxDataKepsek')}}",
-                type : "POST",
-                data : function(d){
-                    console.log(d);
-                    d._token = "{{ csrf_token() }}";
-                }
+    $('#table-kep').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "autoWidth": false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": "{{route('keputusan.ajaxDataKep')}}",
+        columnDefs: [
+            {"targets": 0, "orderable": false},
+            {"targets": 1, "name": 'keputusan'},
+            {"targets": 2, "orderable": false},
+        ],
+        order: [[ 0, "DESC" ]],
+    });
+    function editKep(id) {
+        $.ajax({
+            method: 'GET',
+            url: "{{route('keputusan.editKep')}}",
+            data : {
+                'id' : id
             },
-            columnDefs: [
-                {"targets": 0, "orderable": false},
-                {"targets": 1, "name": 'nama_anggota'},
-                {"targets": 2, "orderable": false},            
-            ],
-            order: [[ 0, "DESC" ]],
-        });
-    })
-<script>
-@endsection
+            dataType: 'JSON',
+            success: function(data) {
+                $('#id_kep').val(data.id);
+                $('#keputusan').val(data.keputusan);
+                $('#button-submit-add1').css('display','none');
+                $('#button-submit-edit1').css('display','block');
+            },
+            fail: function(notifHTML){
+                alert("loh");
+            }
+        }); 
+    }
+    function buttonDeleteKep(data){
+        window.location.href = data.getAttribute('data-link');
+    }
+</script>

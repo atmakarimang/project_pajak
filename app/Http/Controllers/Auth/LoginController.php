@@ -13,7 +13,8 @@ class LoginController extends Controller
 {
     public function index(){
 		if (Auth::check()) {
-            return redirect()->route('dashboard');
+            // return redirect()->route('dashboard');
+            return redirect()->route('pelaksanabidang.index');
         }
     	return view('Auth.login');
     }
@@ -25,7 +26,8 @@ class LoginController extends Controller
         $user_id = $request->user_id;
         $password = $request->password;
         if(!empty(session('user_id'))) {
-            return redirect()->route('dashboard');
+            // return redirect()->route('dashboard');
+            return redirect()->route('pelaksanabidang.index');
         }
 
         if(empty($user_id) || empty($password)) {
@@ -37,7 +39,8 @@ class LoginController extends Controller
                     ->first();
         if(!empty($user)) {
             session(['user_id' => $user->user_id]);
-            return redirect()->route('dashboard');
+            // return redirect()->route('dashboard');
+            return redirect()->route('pelaksanabidang.index');
         } else {
             Session::flash('error', 'User id atau password salah!');
             return redirect()->back();

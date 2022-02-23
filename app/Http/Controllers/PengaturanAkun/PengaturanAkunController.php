@@ -40,9 +40,73 @@ class PengaturanAkunController extends Controller
         $data['page'] = $page;
         $data["mode"] = $mode;
         $data['user'] = $user;
-        $data['dataUser'] = $dataUser;
 
         return view($this->PATH_VIEW.'index',$data);
+    }
+
+    public function datatableAkun(Request $request){
+        $start = $request->input('start');
+        $length = $request->input('length');
+        $draw = $request->input('draw');
+        $search_arr = $request->input('search');
+        $search = $search_arr['value'];
+        $start = ($request->input('start') ? $request->input('start') : 0);
+        $length = ($request->input('length') ? $request->input('length') : 10);
+        $order_arr = $request->input('order');
+        $order_arr = $order_arr[0];
+        $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
+        $orderType = $order_arr['dir']; // ASC or DESC
+        $orderBy = $request->input('columns');
+        $orderBy = $orderBy[$orderByColumnIndex]['name'];//Get name of the sorting column from its index
+        $limit = $length;
+        $offset = $start;
+
+        $jumlahTotal = User::count();
+        
+        if ($search) { // filter data
+            $where = " user_id like lower('%{$search}%') OR nama like lower('%{$search}%')
+            OR jabatan like lower('%{$search}%') OR peran like lower('%{$search}%')";
+            $jumlahFiltered = User::whereRaw("{$where}") ->count(); //hitung data yang telah terfilter
+            if($orderBy !=null){
+                $data = User::whereRaw($where)->orderBy($orderBy, $orderType)->get();
+            }else{
+                $data = User::whereRaw($where)->get();
+            }
+            
+        } else {
+            $jumlahFiltered = $jumlahTotal;
+            if($orderBy !=null){
+                $data = User::offset($offset)->limit($limit)->orderBy($orderBy,$orderType)->get();
+            }else{
+                $data = User::offset($offset)->limit($limit)->get();
+            }
+        }
+        $result = [];
+        foreach ($data as $no => $dt) {
+            $linkedit = url('/pengaturan-akun?mode=edit&usrid='.base64_encode($dt->user_id));
+            $linkdelete = url('/pengaturan-akun/delete',base64_encode($dt->user_id));
+            $action = '<center>
+                            <a href="'.$linkedit.'">
+                                <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
+                            </a>
+                            <button onclick="buttonDelete(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
+                        </center>';
+            $result[] = [
+                $start+$no+1,
+                $dt->user_id,
+                $dt->nama,
+                $dt->jabatan,
+                $dt->peran,
+                $action,
+            ];
+        }
+        echo json_encode(
+            array('draw' => $draw,
+                'recordsTotal' => $jumlahTotal,
+                'recordsFiltered' => $jumlahFiltered,
+                'data' => $result,
+            )
+        );
     }
 
     public function delete($user_id){

@@ -1,7 +1,8 @@
 <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="{{route('dashboard')}}" class="brand-link">
+      <!-- {{route('dashboard')}} -->
+      <a href="" class="brand-link">
         <img src="{{asset('assets/img/LogoKWputih148px.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
           style="opacity: .8">
         <span class="brand-text font-weight-light">A.K.B.P</span>
@@ -11,27 +12,45 @@
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          @php
+            $dtUser = \App\Models\User::where('user_id',session('user_id'))->first();
+          @endphp
           <div class="image">
-            <img src="{{asset('assets/AdminLTE/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
+            <!-- {{asset('assets/AdminLTE/dist/img/user2-160x160.jpg')}} -->
+            <img src="{{!empty($dtUser->ft_profil) ? asset('akun/'.$dtUser->ft_profil) : asset('assets/AdminLTE/dist/img/user2-160x160.jpg')}}" style="width:60px" class="img-circle elevation-2" alt="{{$dtUser->user_id}}">
           </div>
           <div class="info">
             @php
-            $dtUser = \App\Models\User::where('user_id',session('user_id'))->first();
+              $username = $dtUser->nama;
+              $nama = explode(" ", $username);
             @endphp
             <a href="{{url('/pengaturan-akun?mode=edit&usrid=')}}{{base64_encode($dtUser->user_id)}}" class="d-block">{{session('user_id')}}</a>
-            <a href="{{url('/pengaturan-akun?mode=edit&usrid=')}}{{base64_encode($dtUser->user_id)}}" class="d-block">{{$dtUser->nama}}</a>
+            <a href="{{url('/pengaturan-akun?mode=edit&usrid=')}}{{base64_encode($dtUser->user_id)}}" class="d-block">{{$nama[0]}}</a>
           </div>
         </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
             <li class="nav-item has-treeview">
-              <!-- <a href="#" class="nav-link">
-              </a> -->
-              <ul class="nav nav-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <p>
+                  Akun
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview {{ (request()->is('pengaturan-akun*')) ? 'menu-open' : '' }}">
+                @if($dtUser->peran == 'Forecaster')
+                <li class="nav-item">
+                  <a href="{{route('set.akun')}}" class="nav-link {{ (request()->is('pengaturan-akun*')) ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user-cog"></i>
+                    <p>
+                      Pengaturan Akun
+                    </p>
+                  </a>
+                </li>
+                @endif
                 <li class="nav-item">
                   <a href="{{url('logout')}}" class="nav-link">
                     <i class="fas fa-sign-out-alt"></i>
@@ -40,23 +59,16 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item has-treeview">
-              <a href="{{route('set.akun')}}" class="nav-link">
-                <i class="nav-icon fas fa-user-cog"></i>
-                <p>
-                  Pengaturan Akun
-                </p>
-              </a>
-            </li>
-            <li class="nav-item has-treeview">
+            <!-- <li class="nav-item has-treeview">
               <a href="{{route('dashboard')}}" class="nav-link active">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Dashboard
                 </p>
               </a>
-            </li>
-            <li class="nav-item has-treeview">
+            </li> -->
+            @if($dtUser->peran == 'Forecaster')
+            <li class="nav-item has-treeview {{ (request()->is('master-data*')) ? 'menu-open' : '' }}">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
@@ -66,296 +78,126 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{route('permohonan.index')}}" class="nav-link">
+                  <a href="{{route('permohonan.index')}}" class="nav-link {{ (request()->is('master-data/permohonan*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Data Permohonan</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('seksi.index')}}" class="nav-link">
+                  <a href="{{route('seksi.index')}}" class="nav-link {{ (request()->is('master-data/seksi*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Data Seksi</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('pajak.index')}}" class="nav-link">
+                  <a href="{{route('pajak.index')}}" class="nav-link {{ (request()->is('master-data/pajak*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Data Pajak</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('stapro.index')}}" class="nav-link">
+                  <a href="{{route('stapro.index')}}" class="nav-link {{ (request()->is('master-data/statusprogress*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Status & Progress</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('keputusan.index')}}" class="nav-link">
+                  <a href="{{route('keputusan.index')}}" class="nav-link {{ (request()->is('master-data/keputusan*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Data Keputusan</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('amarputusan.index')}}" class="nav-link">
+                  <a href="{{route('amarputusan.index')}}" class="nav-link {{ (request()->is('master-data/amar-putusan*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Data Amar Putusan</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('ptg_banding.index')}}" class="nav-link">
+                  <a href="{{route('ptg_banding.index')}}" class="nav-link {{ (request()->is('master-data/petugas-banding-gugatan*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Petugas Banding Gugatan</p>
                   </a>
                 </li>
               </ul>
             </li>
-            <li class="nav-item has-treeview">
+            @endif
+            <li class="nav-item has-treeview {{ (request()->is('permohonan*')) ? 'menu-open' : '' }}">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
-                  Forms Permohonan
+                  Permohonan
                   <i class="fas fa-angle-left right"></i>
                 </p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{route('pelaksanabidang.index')}}" class="nav-link">
+                  <a href="{{route('pelaksanabidang.index')}}" class="nav-link {{ (request()->is('permohonan/pelaksana-bidang*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Pelaksana Bidang</p>
+                    <p>Forecaster</p>
                   </a>
                 </li>
               </ul>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{route('kasi.index')}}" class="nav-link">
+                  <a href="{{route('kasi.index')}}" class="nav-link {{ (request()->is('permohonan/kasi*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Kasi</p>
+                    <p>Eksekutor</p>
                   </a>
                 </li>
               </ul>
             </li>
-            <li class="nav-item has-treeview">
+            <li class="nav-item has-treeview {{ (request()->is('nonpermohonan*')) ? 'menu-open' : '' }}">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
-                  Forms Non Permohonan
+                  Non Permohonan
                   <i class="fas fa-angle-left right"></i>
                 </p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{route('nonpelaksanabidang.index')}}" class="nav-link">
+                  <a href="{{route('nonpelaksanabidang.index')}}" class="nav-link {{ (request()->is('nonpermohonan/nonpelaksana-bidang*')) ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Pelaksana Bidang</p>
-                  </a>
-                </li>
-              </ul>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Kasi</p>
+                    <p>Eksekutor & Forecaster</p>
                   </a>
                 </li>
               </ul>
             </li>
             <li class="nav-item has-treeview">
-              <a href="{{route('bandinggugatan.index')}}" class="nav-link">
+              <a href="{{route('bandinggugatan.index')}}" class="nav-link {{ (request()->is('banding-gugatan*')) ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
-                  Forms Banding Gugatan
+                  Banding & Gugatan
                 </p>
               </a>
             </li>
-            
-            <li class="nav-header">REPORTS</li>
-            <!-- <li class="nav-item">
-              <a href="pages/calendar.html" class="nav-link">
-                <i class="nav-icon far fa-calendar-alt"></i>
+            <li class="nav-header">
+              E-REPORTING
+            </li>
+            <li class="nav-item">
+              <a href="{{route('laporan_permohonan.index')}}" class="nav-link {{ (request()->is('laporan/permohonan*')) ? 'active' : '' }}">
+                <i class="nav-icon fas fa-copy"></i>
                 <p>
-                  Calendar
-                  <span class="badge badge-info right">2</span>
+                  Permohonan
                 </p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="pages/gallery.html" class="nav-link">
-                <i class="nav-icon far fa-image"></i>
+              <a href="{{route('laporan_nonpermohonan.index')}}" class="nav-link {{ (request()->is('laporan/nonpermohonan*')) ? 'active' : '' }}">
+                <i class="nav-icon fas fa-copy"></i>
                 <p>
-                  Gallery
+                  Non Permohonan
                 </p>
               </a>
             </li>
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
-                <i class="nav-icon far fa-envelope"></i>
+            <!-- <li class="nav-item">
+              <a href="" class="nav-link">
+                <i class="nav-icon fas fa-copy"></i>
                 <p>
-                  Mailbox
-                  <i class="fas fa-angle-left right"></i>
+                  Banding & Gugatan
                 </p>
               </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="pages/mailbox/mailbox.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Inbox</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/mailbox/compose.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Compose</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/mailbox/read-mail.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Read</p>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-book"></i>
-                <p>
-                  Pages
-                  <i class="fas fa-angle-left right"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="pages/examples/invoice.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Invoice</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/profile.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Profile</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/e-commerce.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>E-commerce</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/projects.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Projects</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/project-add.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Project Add</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/project-edit.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Project Edit</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/project-detail.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Project Detail</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/contacts.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Contacts</p>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
-                <i class="nav-icon far fa-plus-square"></i>
-                <p>
-                  Extras
-                  <i class="fas fa-angle-left right"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="pages/examples/login.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Login</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/register.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Register</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/forgot-password.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Forgot Password</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/recover-password.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Recover Password</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/lockscreen.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Lockscreen</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/legacy-user-menu.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Legacy User Menu</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/language-menu.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Language Menu</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/404.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Error 404</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/500.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Error 500</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/pace.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Pace</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="pages/examples/blank.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Blank Page</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="starter.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Starter Page</p>
-                  </a>
-                </li>
-              </ul>
             </li> -->
           </ul>
         </nav>
@@ -363,3 +205,21 @@
       </div>
       <!-- /.sidebar -->
     </aside>
+    <script>
+      // /* Code for changing active 
+      //       link on clicking */
+      //       var btns = 
+      //           $(".sidebar .nav-link");
+  
+      //       for (var i = 0; i < btns.length; i++) {
+      //         console.log("F");
+      //           btns[i].addEventListener("click",function () {
+      //                                   console.log("ADF");
+      //               var current = document.getElementsByClassName("active");
+      //             console.log(current);
+      //               current[0].className = current[0].className.replace(" active", "");
+  
+      //               this.className += " active";
+      //           });
+      //       }
+    </script>

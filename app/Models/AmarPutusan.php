@@ -19,5 +19,10 @@ class AmarPutusan extends Model
         $data->save();
         return $data;
     }
+    public static function updateDt($request,$data){
+        $data->amar_putusan = $request->amar_putusan;
+        $data->save();
+        return $data;
+    }
 }
 ?>

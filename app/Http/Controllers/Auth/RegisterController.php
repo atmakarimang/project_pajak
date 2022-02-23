@@ -80,6 +80,14 @@ class RegisterController extends Controller
                 Session::flash('error', 'User id sudah digunakan!');
                 return redirect()->back();
             }
+            if ($request->hasFile('ft_profil')) {
+                $resi = $request->hasFile("ft_profil");
+                $ext = strtolower($request->noresi->getClientOriginalExtension());
+                $filename = "$request->user_id.$ext";
+                $request->ft_profil->move('public/akun/', $filename);
+            }else{
+                $filename ='';
+            }
             try {
                 User::create([
                     'user_id' => $request->user_id,
@@ -87,6 +95,7 @@ class RegisterController extends Controller
                     'password' => md5($request->password),
                     'jabatan' => $request->jabatan,
                     'peran' => $request->peran,
+                    'ft_profil' => $filename,
                     'created_at' => date("Y-m-d H:i:s"),
                 ]);
             }catch(\Exception $e) {
@@ -112,12 +121,21 @@ class RegisterController extends Controller
                 Session::flash('error', 'Password lama anda salah!');
                 return redirect()->back();
             }
+            if ($request->hasFile('ft_profil')) {
+                $ft_profil = $request->hasFile("ft_profil");
+                $ext = strtolower($request->ft_profil->getClientOriginalExtension());
+                $filename = "$request->user_id.$ext";
+                $request->ft_profil->move('public/akun/', $filename);
+            }else{
+                $filename ='';
+            }
             try {
                 User::where("user_id", $request->user_id)->update([
                     'nama' => $request->nama,
                     'password' => md5($request->password),
                     'jabatan' => $request->jabatan,
                     'peran' => $request->peran,
+                    'ft_profil' => $filename,
                     'updated_at' => date("Y-m-d H:i:s"),
                 ]);
             }catch(\Exception $e) {

@@ -19,5 +19,11 @@ class AnggotaSeksi extends Model
         $data->save();
         return $data;
     }
+
+    public static function updateDt($request,$data){
+        $data->nama_anggota = $request->nama_kepala;
+        $data->save();
+        return $data;
+    }
 }
 ?>
