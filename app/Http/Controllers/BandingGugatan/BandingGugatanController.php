@@ -30,7 +30,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class BandingGugatanController extends Controller
 {
-    protected $PATH_VIEW = 'bandingGugatan.';
+    protected $PATH_VIEW = 'bandinggugatan.';
 
     public function __construct()
     {
