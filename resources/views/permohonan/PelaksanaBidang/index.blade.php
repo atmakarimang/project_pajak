@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2/css/select2.min.css')}}">
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
  
-  <link href="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css">
+  <link href="{{asset('plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css">
   <!-- datetime picker -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.4/css/bootstrap-datetimepicker.min.css"/>
   @include('layouts.dashboard.styleSheet')
@@ -462,7 +462,7 @@
 </body>
 
 </html>
-<script src="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+<script src="{{asset('plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
 <!-- InputMask -->
 <script src="{{asset('assets/AdminLTE/plugins/moment/moment.min.js')}}"></script>
 <script src="{{asset('assets/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js')}}"></script>

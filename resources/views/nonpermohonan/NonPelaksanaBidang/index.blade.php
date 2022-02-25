@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2/css/select2.min.css')}}">
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Eonasdan/bootstrap-datetimepicker@a549aa8780dbda16f6cff545aeabc3d71073911e/build/css/bootstrap-datetimepicker.css">
-  <link href="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css">
+  <link href="{{asset('plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css">
   @include('layouts.dashboard.styleSheet')
 </head>
 
@@ -280,7 +280,7 @@
 </body>
 </html>
 
-<script src="{{asset('public/plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+<script src="{{asset('plugins/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
 <!-- InputMask -->
 <script src="{{asset('assets/AdminLTE/plugins/moment/moment.min.js')}}"></script>
 <script src="{{asset('assets/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js')}}"></script>
