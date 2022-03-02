@@ -11,6 +11,11 @@ use Session;
 
 class LoginController extends Controller
 {
+    public function __construct()
+    {
+        //$this->middleware('checkLogin', ['except' => ['logout']]);
+    }
+
     public function index()
     {
         if (Auth::check()) {
@@ -19,10 +24,12 @@ class LoginController extends Controller
         }
         return view('auth.login');
     }
+
     public function showLoginForm()
     {
         return view('auth.login');
     }
+
     public function proses_login(Request $request)
     {
         $user_id = $request->user_id;

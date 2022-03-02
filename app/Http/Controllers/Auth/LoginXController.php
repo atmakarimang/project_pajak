@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth; // baru
 use Session;
 
-class LoginController extends Controller
+class LoginXController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -40,31 +40,33 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
-    public function index(){
-		if (Auth::check()) {
+    public function index()
+    {
+        if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-    	return view('login');
+        return view('login');
     }
-    public function proses_login(Request $request){
-    	request()->validate([
-    		'user_id' => 'required',
-    		'password' => 'required',
-    	]);
+    public function proses_login(Request $request)
+    {
+        request()->validate([
+            'user_id' => 'required',
+            'password' => 'required',
+        ]);
 
-    	$credentials = $request->only('user_id','password');
-		Auth::attempt($credentials);
-		if (Auth::check()) {
-			return redirect()->route('dashboard');
-  
+        $credentials = $request->only('user_id', 'password');
+        Auth::attempt($credentials);
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
         } else {
             Session::flash('error', 'User ID atau password salah!');
             return redirect()->route('login');
         }
     }
-    public function logout(Request $request){
-    	$request->session()->flush();
-    	Auth::logout();
-    	return redirect('login');
+    public function logout(Request $request)
+    {
+        $request->session()->flush();
+        Auth::logout();
+        return redirect('login');
     }
 }

@@ -20,11 +20,21 @@ class CheckLogin
     {
         $request->route();
 
-        // dd($request->route()->parameters());
+        //dd($request->route()->parameters());
+        //dd(Session::get('user_id'));
+        //dd($request->route());
+
         if (empty(Session::get('user_id'))) {
             return redirect('/login');
+        } else {
+            //return redirect('/dashboard');
+            //return $next($request);
+            $link = substr($request->getPathInfo(), 1);
+            if ($link == "" || $link == "login") {
+                return redirect('/dashboard');
+            } else {
+                return $next($request);
+            }
         }
-
-        return $next($request);
     }
 }
