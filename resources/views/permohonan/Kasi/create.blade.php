@@ -651,7 +651,18 @@
         }
         bsCustomFileInput.init();
         // Format mata uang.
-        $('.uang').maskMoney();
+        //$('.uang').maskMoney();
+
+        // Format mata uang baru
+        $('.uang').inputmask("decimal", {
+            radixPoint: ",",
+            groupSeparator: ".",
+            autoGroup: true,
+            prefix: '', //Space after $, this will not truncate the first character.
+            rightAlign: false,
+            autoUnmask: true
+        });
+
     });
     $(function () {
         //Initialize Select2 Elements

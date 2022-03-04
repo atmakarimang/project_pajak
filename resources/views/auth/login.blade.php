@@ -18,23 +18,84 @@
   <link rel="stylesheet" href="{{asset('assets/AdminLTE/dist/css/adminlte.min.css')}}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+
   <style>
     .login-page {
-      background-image: url("{{asset('assets/img/bg2.png')}}");
+      background-image: url("{{asset('assets/img/bg_new-min.jpg')}}");
       /* Center and scale the image nicely */
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
+      position: relative; 
+    }
+
+    .companyname {
+      font-family: 'Roboto', sans-serif;
+      font-size: 33px;
+      font-weight: bold;
+      color: rgb(33, 39, 43);
+      text-align: center; 
+      margin-left: 5px;
+    }
+
+    .photo-tag {
       position: relative;
-      left: 500px;
-    } 
+      color: aliceblue;
+      top: 130px;
+      text-decoration: underline;
+    }
+
+    .ion-link {
+      position: relative; 
+      top: 5px;
+      right: 4px;
+      font-size: 28px;
+    }
+
+    #logoperusahaan{
+      position: relative;
+      bottom: 5px;
+    }
+    
+    @media (min-width: 481px) {
+      .login-box {
+        position: relative;
+        left: 500px;
+      }
+
+      .photo-tag {
+        position: relative;
+        color: aliceblue;
+        left: 500px;
+        top: 150px;
+        text-decoration: underline;
+      }
+
+      .ion-link {
+        position: relative; 
+        top: 5px;
+        right: 4px;
+        font-size: 28px;
+      }
+
+      #logoperusahaan{
+        position: relative;
+        bottom: 5px;
+        right: 1px;
+      }
+    }
+
   </style>
 </head>
 
 <body class="hold-transition login-page ">
 <div class="login-box">
   <div class="login-logo">
-    <img src="{{asset('assets/img/LogoKW1.png')}}" width="46px"> <b>A.K.B.P</b> 
+    <img src="{{asset('assets/img/LogoKW1.png')}}" width="46px" id="logoperusahaan"> <b class="companyname">A.K.B.P</b> 
   </div>
   <!-- /.login-logo -->
   <div class="card"> 
@@ -70,6 +131,9 @@
     </div>
     <!-- /.login-card-body -->
   </div>
+</div>
+<div class="photo-tag"> 
+  <i class="ion-link"></i><b>Photo by M Ahsannudin A</b>
 </div>
 <!-- /.login-box -->
 

@@ -46,6 +46,7 @@ class PelaksanaBidang extends Model
         $data->tgl_byr_pmk = date('Y-m-d', strtotime($request->tgl_bayar));
         $data->no = substr($request->no_agenda, 2, 7);
         $data->tahun = date('Y');
+
         //dd($data->save());
         //dd($data);
         $data->save();
@@ -113,7 +114,7 @@ class PelaksanaBidang extends Model
         $krg  = floatval(str_replace(',', '.', str_replace('.', '', $request->jumlah_krg)));
         $jbp = floatval(str_replace(',', '.', str_replace('.', '', $request->jumlah_bayarprod)));
 
-        //dd($jba,$tk,$jbp);
+        //dd($jba, $tk, $jbp);
         $data->jml_byr_semula = $jba;
         $data->tambah = $tbh;
         $data->kurang = $krg;
