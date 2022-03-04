@@ -64,14 +64,14 @@
     @media (min-width: 481px) {
       .login-box {
         position: relative;
-        left: 500px;
+        left: 400px;
       }
 
       .photo-tag {
         position: relative;
         color: aliceblue;
-        left: 500px;
-        top: 150px;
+        left: 400px;
+        top: 120px;
         text-decoration: underline;
       }
 
