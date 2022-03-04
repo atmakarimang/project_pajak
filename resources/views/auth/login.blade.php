@@ -26,6 +26,7 @@
       background-repeat: no-repeat;
       background-size: cover;
       position: relative;
+      left: 500px;
     } 
   </style>
 </head>
@@ -36,7 +37,7 @@
     <img src="{{asset('assets/img/LogoKW1.png')}}" width="46px"> <b>A.K.B.P</b> 
   </div>
   <!-- /.login-logo -->
-  <div class="card">
+  <div class="card"> 
     <div class="card-body login-card-body">
       <p class="login-box-msg">Sign in </p>
 

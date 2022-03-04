@@ -397,9 +397,9 @@
                                     <div class="form-group">
                                         <label for="no_prodhukum">No Produk Hukum</label>
                                         @if($dataPB->no_produk_hukum)
-                                            <input type="text" id="no_prodhukum" name="no_prodhukum" class="form-control" value="{{$dataPB->no_produk_hukum}}" required>
+                                            <input type="text" id="no_prodhukum" name="no_prodhukum" class="form-control" value="{{$dataPB->no_produk_hukum}}">
                                         @else
-                                            <input type="text" id="no_prodhukum" name="no_prodhukum" class="form-control" required>
+                                            <input type="text" id="no_prodhukum" name="no_prodhukum" class="form-control">
                                         @endif
                                     </div>
                                 </div>
@@ -410,7 +410,7 @@
                                             @php
                                                 $tgl = date('d-m-Y', strtotime($dataPB->tgl_produk_hukum));
                                             @endphp
-                                            <input type="text" name="tgl_prodhukum" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_produk_hukum) ? $tgl :''}}" required/>
+                                            <input type="text" name="tgl_prodhukum" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_produk_hukum) ? $tgl :''}}"/>
                                             <div class="input-group-append" data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>
@@ -431,14 +431,14 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><b>Rp.</b></span>
                                                 </div>
-                                                <input type="text" id="jumlah_bayar_awl" name="jumlah_bayar_awl" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$jbs}}" required>
+                                                <input type="text" id="jumlah_bayar_awl" name="jumlah_bayar_awl" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$jbs}}">
                                             </div>
                                             @else
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><b>Rp.</b></span>
                                                 </div>
-                                                <input type="text" id="jumlah_bayar_awl" name="jumlah_bayar_awl" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," required>
+                                                <input type="text" id="jumlah_bayar_awl" name="jumlah_bayar_awl" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal=",">
                                             </div>
                                             @endif
                                         </div>
@@ -455,14 +455,14 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><b>Rp.</b></span>
                                             </div>
-                                            <input type="text" id="jumlah_tbh" name="jumlah_tbh" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$tbh}}" required>
+                                            <input type="text" id="jumlah_tbh" name="jumlah_tbh" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$tbh}}">
                                         </div>
                                         @else
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><b>Rp.</b></span>
                                             </div>
-                                            <input type="text" id="jumlah_tbh" name="jumlah_tbh" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," required>
+                                            <input type="text" id="jumlah_tbh" name="jumlah_tbh" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal=",">
                                         </div>
                                         @endif
                                     </div>
@@ -478,14 +478,14 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><b>Rp.</b></span>
                                             </div>
-                                            <input type="text" id="jumlah_krg" name="jumlah_krg" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$krg}}" required>
+                                            <input type="text" id="jumlah_krg" name="jumlah_krg" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$krg}}">
                                         </div>
                                         @else
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><b>Rp.</b></span>
                                             </div>
-                                            <input type="text" id="jumlah_krg" name="jumlah_krg" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," required>
+                                            <input type="text" id="jumlah_krg" name="jumlah_krg" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal=",">
                                         </div>
                                         @endif
                                     </div>
@@ -505,14 +505,14 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><b>Rp.</b></span>
                                                 </div>
-                                                <input type="text" id="jumlah_bayarprod" name="jumlah_bayarprod" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$jbpr}}" required>
+                                                <input type="text" id="jumlah_bayarprod" name="jumlah_bayarprod" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="{{$jbpr}}">
                                             </div>
                                             @else
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><b>Rp.</b></span>
                                                 </div>
-                                                <input type="text" id="jumlah_bayarprod" name="jumlah_bayarprod" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," required>
+                                                <input type="text" id="jumlah_bayarprod" name="jumlah_bayarprod" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal=",">
                                             </div>
                                             @endif
                                         </div>
@@ -560,7 +560,7 @@
                                             @php
                                                 $tgl = date('d-m-Y', strtotime($dataPB->tgl_resi));
                                             @endphp
-                                            <input type="text" name="tgl_resi" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_resi) ? $tgl :''}}" required/>
+                                            <input type="text" name="tgl_resi" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_resi) ? $tgl :''}}"/>
                                             <div class="input-group-append" data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>
@@ -573,9 +573,9 @@
                                     <div class="form-group">
                                         <label>No Surat Pengantar</label>
                                         @if($dataPB->no_srt_pengantar)
-                                            <input type="text" id="no_srtpengantar" name="no_srtpengantar" class="form-control" value="{{$dataPB->no_srt_pengantar}}" required>
+                                            <input type="text" id="no_srtpengantar" name="no_srtpengantar" class="form-control" value="{{$dataPB->no_srt_pengantar}}">
                                         @else
-                                            <input type="text" id="no_srtpengantar" name="no_srtpengantar" class="form-control" required>
+                                            <input type="text" id="no_srtpengantar" name="no_srtpengantar" class="form-control">
                                         @endif
                                     </div>
                                 </div>
@@ -587,7 +587,7 @@
                                             @php
                                                 $tgl = date('d-m-Y', strtotime($dataPB->tgl_srt_pengantar));
                                             @endphp
-                                            <input type="text" name="tgl_srtpengantar" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_srt_pengantar) ? $tgl :''}}" required/>
+                                            <input type="text" name="tgl_srtpengantar" class="form-control datetimepicker-input datenya" value="{{!empty($dataPB->tgl_srt_pengantar) ? $tgl :''}}"/>
                                             <div class="input-group-append" data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>

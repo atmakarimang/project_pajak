@@ -101,9 +101,9 @@
                           <div class="form-group">
                             <label for="no_naskahdinas">No Naskah Dinas</label>
                             @if(!empty($dtPB->no_naskah_dinas))
-                              <input type="text" id="no_naskahdinas" name="no_naskahdinas" class="form-control" value="{{$dtPB->no_naskah_dinas}}" required>
+                              <input type="text" id="no_naskahdinas" name="no_naskahdinas" class="form-control" value="{{$dtPB->no_naskah_dinas}}">
                             @else
-                              <input type="text" id="no_naskahdinas" name="no_naskahdinas" class="form-control" required>
+                              <input type="text" id="no_naskahdinas" name="no_naskahdinas" class="form-control">
                             @endif
                           </div>
                         </div>
@@ -115,9 +115,9 @@
                                   @php
                                     $tgl = date('d-m-Y', strtotime($dtPB->tgl_naskah_dinas));
                                   @endphp
-                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
+                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/> 
                                 @else
-                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya" required/>
+                                  <input type="text" name="tgl_naskahdinas" class="form-control datetimepicker-input datenya"/>
                                 @endif
                                 <div class="input-group-append">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -142,9 +142,9 @@
                           <div class="form-group">
                               <label for="no_arusdok">No Lembar Pengawasan Arus Dokumen</label>
                               @if(!empty($dtPB->no_lbr_pengawas_dok))
-                                <input type="text" id="no_arusdok" name="no_arusdok" class="form-control" value="{{$dtPB->no_lbr_pengawas_dok}}" required>
+                                <input type="text" id="no_arusdok" name="no_arusdok" class="form-control" value="{{$dtPB->no_lbr_pengawas_dok}}">
                               @else
-                                <input type="text" id="no_arusdok" name="no_arusdok" class="form-control" required>
+                                <input type="text" id="no_arusdok" name="no_arusdok" class="form-control">
                               @endif
                           </div>
                         </div>
@@ -158,9 +158,9 @@
                                   @php
                                     $tgl = date('d-m-Y', strtotime($dtPB->tgl_diterima_kpp));
                                   @endphp
-                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
+                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                                 @else
-                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya" required/>
+                                  <input type="text" name="tgl_in_kpp" class="form-control datetimepicker-input datenya"/>
                                 @endif
                                 <div class="input-group-append">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -176,9 +176,9 @@
                                   @php
                                     $tgl = date('d-m-Y', strtotime($dtPB->tgl_diterima_kanwil));
                                   @endphp
-                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
+                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                                 @else
-                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya" required/>
+                                  <input type="text" name="tgl_in_kanwil" class="form-control datetimepicker-input datenya"/>
                                 @endif
                                 <div class="input-group-append">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -192,9 +192,9 @@
                           <div class="form-group">
                             <label for="no_npwp">No Pokok Wajib Pajak</label>
                             @if(!empty($dtPB->npwp))
-                              <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dtPB->npwp}}" required>
+                              <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dtPB->npwp}}">
                             @else
-                              <input type="text" id="no_npwp" name="no_npwp" class="form-control" required>
+                              <input type="text" id="no_npwp" name="no_npwp" class="form-control">
                             @endif
                           </div>
                         </div>
@@ -202,9 +202,9 @@
                           <div class="form-group">
                             <label for="nama_npwp">Nama Wajib Pajak</label>
                             @if(!empty($dtPB->nama_wajib_pajak))
-                              <input type="text" id="nama_npwp" name="nama_npwp" class="form-control" value="{{$dtPB->nama_wajib_pajak}}" required>
+                              <input type="text" id="nama_npwp" name="nama_npwp" class="form-control" value="{{$dtPB->nama_wajib_pajak}}">
                             @else
-                              <input type="text" id="nama_npwp" name="nama_npwp" class="form-control" required>
+                              <input type="text" id="nama_npwp" name="nama_npwp" class="form-control">
                             @endif
                           </div>
                         </div>
@@ -249,9 +249,9 @@
                           <div class="form-group">
                             <label for="no_ketetapan">No Ketetapan</label>
                             @if(!empty($dtPB->no_ketetapan))
-                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" placeholder="XXXXX/XXX/XX/XXX/XX" value="{{$dtPB->no_ketetapan}}" required>
+                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" placeholder="XXXXX/XXX/XX/XXX/XX" value="{{$dtPB->no_ketetapan}}">
                             @else
-                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control" required>
+                              <input type="text" id="no_ketetapan" name="no_ketetapan" class="form-control">
                             @endif
                           </div>
                         </div>
@@ -265,9 +265,9 @@
                                 @php
                                   $tgl = date('d-m-Y', strtotime($dtPB->tgl_ketetapan));
                                 @endphp
-                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
+                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                               @else
-                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" required/>
+                                <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya"/>
                               @endif
                               <div class="input-group-append">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -301,9 +301,9 @@
                           <div class="form-group">
                             <label for="tahun_pajak">Tahun Pajak</label>
                             @if(!empty($dtPB->tahun_pajak))
-                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" value="{{$dtPB->tahun_pajak}}" required>
+                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" value="{{$dtPB->tahun_pajak}}">
                             @else
-                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" required>
+                              <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year">
                             @endif
                           </div>
                         </div>
@@ -324,9 +324,9 @@
                           <div class="form-group">
                             <label for="no_srt_per">No Surat Permohonan</label>
                             @if(!empty($dtPB->no_srt_permohonan))
-                              <input type="text" id="no_srt_per" name="no_srt_per" class="form-control" value="{{$dtPB->no_srt_permohonan}}" required>
+                              <input type="text" id="no_srt_per" name="no_srt_per" class="form-control" value="{{$dtPB->no_srt_permohonan}}">
                             @else
-                              <input type="text" id="no_srt_per" name="no_srt_per" class="form-control" required>
+                              <input type="text" id="no_srt_per" name="no_srt_per" class="form-control"> 
                             @endif
                           </div>
                         </div>
@@ -338,9 +338,9 @@
                                 @php
                                   $tgl = date('d-m-Y', strtotime($dtPB->tgl_srt_permohonan));
                                 @endphp
-                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" value="{{$tgl}}" required/>
+                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                               @else
-                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" required/>
+                                <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya"/>
                               @endif
                               <div class="input-group-append">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>

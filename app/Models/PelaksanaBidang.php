@@ -18,7 +18,7 @@ class PelaksanaBidang extends Model
         $data = new PelaksanaBidang();
         $data->no_agenda = $request->no_agenda;
         $data->tgl_agenda = date('Y-m-d', strtotime($request->tgl_agenda));
-        $data->no_naskah_dinas = $request->no_naskahdinas;
+        $data->no_naskah_dinas = (!empty($request->no_naskahdinas)) ? $request->no_naskahdinas : "";
         $data->tgl_naskah_dinas = date('Y-m-d', strtotime($request->tgl_naskahdinas));
         $data->pemohon = $request->asal_permohonan;
         $data->no_lbr_pengawas_dok = $request->no_arusdok;
@@ -42,7 +42,7 @@ class PelaksanaBidang extends Model
         }
         $data->status = $request->status;
         $data->progress = $request->progress;
-        $data->jumlah_byr_pmk = preg_replace('/[^\d\.]/', '', $request->jumlah_bayar);
+        $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? preg_replace('/[^\d\.]/', '', $request->jumlah_bayar) : 0;
         $data->tgl_byr_pmk = date('Y-m-d', strtotime($request->tgl_bayar));
         $data->no = substr($request->no_agenda, 2, 7);
         $data->tahun = date('Y');
