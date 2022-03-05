@@ -32,16 +32,19 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
+            <li class="nav-item has-treeview {{ (request()->is('pengaturan-akun*')) ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ (request()->is('pengaturan-akun*')) ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-cog"></i>
                 <p>
                   Akun
                   <i class="fas fa-angle-left right"></i>
                 </p>
               </a>
-              <ul class="nav nav-treeview {{ (request()->is('pengaturan-akun*')) ? 'menu-open' : '' }}">
+              <ul class="nav nav-treeview">
                 @if($dtUser->peran == 'Forecaster')
+                @php
+                    //dd(request()->segment(1));
+                @endphp
                 <li class="nav-item">
                   <a href="{{route('set.akun')}}" class="nav-link {{ (request()->is('pengaturan-akun*')) ? 'active' : '' }}">
                     <i class="nav-icon fas fa-user-cog"></i>
@@ -53,7 +56,7 @@
                 @endif
                 <li class="nav-item">
                   <a href="{{url('logout')}}" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
                     <p>Logout</p>
                   </a>
                 </li>
@@ -69,7 +72,7 @@
             </li> -->
             @if($dtUser->peran == 'Forecaster')
             <li class="nav-item has-treeview {{ (request()->is('master-data*')) ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link">
+              <a href="#" class="nav-link {{ (request()->is('master-data*')) ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
                   Master Data
@@ -123,7 +126,7 @@
             </li>
             @endif
             <li class="nav-item has-treeview {{ (request()->is('permohonan*')) ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link">
+              <a href="#" class="nav-link {{ (request()->is('permohonan*')) ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
                   Permohonan
@@ -148,7 +151,7 @@
               </ul>
             </li>
             <li class="nav-item has-treeview {{ (request()->is('nonpermohonan*')) ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link">
+              <a href="#" class="nav-link {{ (request()->is('nonpermohonan*')) ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
                   Non Permohonan
