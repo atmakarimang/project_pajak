@@ -92,6 +92,7 @@
 <script>
   $(document).ready(function () {
     $('#tabel-kasi').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

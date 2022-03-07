@@ -166,6 +166,7 @@
 </html>
 <script>
     $('#table-ap').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -205,6 +206,7 @@
     }
 
     $('#table-jp').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

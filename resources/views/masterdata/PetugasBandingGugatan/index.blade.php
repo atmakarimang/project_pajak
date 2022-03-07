@@ -165,6 +165,7 @@
 </html>
 <script>
     $('#table-petsidang').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -204,6 +205,7 @@
     }
 
     $('#table-eksekutor').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

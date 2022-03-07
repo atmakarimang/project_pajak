@@ -43,12 +43,9 @@ class PelaksanaBidang extends Model
         $data->status = $request->status;
         $data->progress = $request->progress;
         $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? preg_replace('/[^\d\.]/', '', $request->jumlah_bayar) : 0;
-        $data->tgl_byr_pmk = date('Y-m-d', strtotime($request->tgl_bayar));
+        $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
         $data->no = substr($request->no_agenda, 2, 7);
         $data->tahun = date('Y');
-
-        //dd($data->save());
-        //dd($data);
         $data->save();
         return $data;
     }
@@ -80,7 +77,7 @@ class PelaksanaBidang extends Model
         $data->status = $request->status;
         $data->progress = $request->progress;
         $data->jumlah_byr_pmk = preg_replace('/[^\d\.]/', '', $request->jumlah_bayar);
-        $data->tgl_byr_pmk = date('Y-m-d', strtotime($request->tgl_bayar));
+        $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
         $data->save();
         return $data;
     }

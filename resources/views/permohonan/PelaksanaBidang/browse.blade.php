@@ -97,6 +97,7 @@
 
 <script>
   $('#tabel-pb').DataTable({
+    "destroy": true,
     "paging": true,
     "ordering": true,
     "searching": true,

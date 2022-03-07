@@ -70,7 +70,7 @@
       .photo-tag {
         position: relative;
         color: aliceblue;
-        left: 400px;
+        right: 500px;
         top: 120px;
         text-decoration: underline;
       }

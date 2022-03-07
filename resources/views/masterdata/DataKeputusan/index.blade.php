@@ -112,6 +112,7 @@
 </html>
 <script>
     $('#table-kep').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

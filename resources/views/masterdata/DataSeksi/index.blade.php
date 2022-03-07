@@ -222,6 +222,7 @@
 </html>
 <script>
     $('#table-kepsek').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -260,6 +261,7 @@
         window.location.href = data.getAttribute('data-link');
     }
     $('#table-konseptor').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -298,6 +300,7 @@
         window.location.href = data.getAttribute('data-link');
     }
     $('#table-pk').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

@@ -225,6 +225,7 @@
 </html>
 <script>
     $('#table-asl_pemohon').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -277,6 +278,7 @@
         // });
     }
     $('#table-jp').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,
@@ -315,6 +317,7 @@
         window.location.href = data.getAttribute('data-link');
     }
     $('#table-kp').DataTable({
+        "destroy" : true,
         "paging": true,
         "ordering": true,
         "searching": true,

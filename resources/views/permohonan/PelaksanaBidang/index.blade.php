@@ -397,9 +397,20 @@
                           <div class="form-group">
                             <label for="jumlah_bayar">Jumlah Pembayaran a/ PMK-29 & PMK-91</label>
                             @if(!empty($dtPB->jumlah_byr_pmk))
-                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" value="{{$dtPB->jumlah_byr_pmk}}">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"><b>Rp.</b></span>
+                                </div>
+                                <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control uang" value="{{$dtPB->jumlah_byr_pmk}}">
+                              </div>
+                              <!-- <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" value="{{$dtPB->jumlah_byr_pmk}}"> -->
                             @else
-                              <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"><b>Rp.</b></span>
+                                </div>
+                                <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control uang" data-affixes-stay="true" data-thousands="." data-decimal="," value="">
+                              </div>
                             @endif
                           </div>
                         </div>
@@ -476,13 +487,24 @@
 <script src="{{asset('assets/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 <!-- Select2 -->
 <script src="{{asset('assets/AdminLTE/plugins/select2/js/select2.full.min.js')}}"></script>
-
+<!-- <script src="{{asset('assets/AdminLTE/plugins/jquery-maskmoney/jquery.maskMoney.js')}}"></script>
+<script src="{{asset('assets/AdminLTE/plugins/jquery-maskmoney/jquery.maskMoney.min.js')}}"></script> -->
 <script>
   $(function () {
     // XX.XXX.XXX.X-XXX.XXX
     $('#no_npwp').mask("00.000.000.0-000.000", {placeholder: "__.__.___.___._-___.___"});
     // XXXXX/XXX/XX/XXX/XX
     $('#no_ketetapan').mask("00000/000/00/000/00", {placeholder: "_____/___/__/___/__"});
+    // Format mata uang.
+    // $('.uang').maskMoney();
+    $('.uang').inputmask("decimal", {
+      radixPoint: ".",
+      groupSeparator: ",",
+      autoGroup: true,
+      prefix: '', //Space after $, this will not truncate the first character.
+      rightAlign: false,
+      autoUnmask: true
+    });
     var cekuser = "{{$user->peran}}";
     if (cekuser == 'Forecaster'){
       $('.form-control, .submit, .reset, .form-check-input').prop('disabled',false);
