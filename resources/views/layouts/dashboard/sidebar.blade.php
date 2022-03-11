@@ -82,43 +82,43 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{route('permohonan.index')}}" class="nav-link {{ (request()->is('master-data/permohonan*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-book nav-icon"></i>
                     <p>Data Permohonan</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('seksi.index')}}" class="nav-link {{ (request()->is('master-data/seksi*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-clipboard-check nav-icon"></i>
                     <p>Data Seksi</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('pajak.index')}}" class="nav-link {{ (request()->is('master-data/pajak*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-calculator nav-icon"></i>
                     <p>Data Pajak</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('stapro.index')}}" class="nav-link {{ (request()->is('master-data/statusprogress*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-star-half-alt nav-icon"></i>
                     <p>Status & Progress</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('keputusan.index')}}" class="nav-link {{ (request()->is('master-data/keputusan*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-landmark nav-icon"></i>
                     <p>Data Keputusan</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('amarputusan.index')}}" class="nav-link {{ (request()->is('master-data/amar-putusan*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-landmark nav-icon"></i>
                     <p>Data Amar Putusan</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('ptg_banding.index')}}" class="nav-link {{ (request()->is('master-data/petugas-banding-gugatan*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-user-shield nav-icon"></i>
                     <p>Petugas Banding Gugatan</p>
                   </a>
                 </li>
@@ -127,7 +127,7 @@
             @endif
             <li class="nav-item has-treeview {{ (request()->is('permohonan*')) ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ (request()->is('permohonan*')) ? 'active' : '' }}">
-                <i class="nav-icon fas fa-edit"></i>
+                <i class="nav-icon fas fa-paste"></i>
                 <p>
                   Permohonan
                   <i class="fas fa-angle-left right"></i>
@@ -136,7 +136,7 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{route('pelaksanabidang.index')}}" class="nav-link {{ (request()->is('permohonan/pelaksana-bidang*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-chess-queen nav-icon"></i>
                     <p>Forecaster</p>
                   </a>
                 </li>
@@ -144,7 +144,7 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{route('kasi.index')}}" class="nav-link {{ (request()->is('permohonan/kasi*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-chess-king nav-icon"></i>
                     <p>Eksekutor</p>
                   </a>
                 </li>
@@ -152,7 +152,8 @@
             </li>
             <li class="nav-item has-treeview {{ (request()->is('nonpermohonan*')) ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ (request()->is('nonpermohonan*')) ? 'active' : '' }}">
-                <i class="nav-icon fas fa-edit"></i>
+                {{-- <i class="nav-icon fas fa-edit"></i> --}}
+                <i class="nav-icon fas fa-print"></i>
                 <p>
                   Non Permohonan
                   <i class="fas fa-angle-left right"></i>
@@ -161,7 +162,7 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{route('nonpelaksanabidang.index')}}" class="nav-link {{ (request()->is('nonpermohonan/nonpelaksana-bidang*')) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <i class="fas fa-chess nav-icon"></i>
                     <p>Eksekutor & Forecaster</p>
                   </a>
                 </li>
@@ -169,7 +170,7 @@
             </li>
             <li class="nav-item has-treeview">
               <a href="{{route('bandinggugatan.index')}}" class="nav-link {{ (request()->is('banding-gugatan*')) ? 'active' : '' }}">
-                <i class="nav-icon fas fa-edit"></i>
+                <i class="nav-icon fas fa-balance-scale"></i>
                 <p>
                   Banding & Gugatan
                 </p>
@@ -180,7 +181,7 @@
             </li>
             <li class="nav-item">
               <a href="{{route('laporan_permohonan.index')}}" class="nav-link {{ (request()->is('laporan/permohonan*')) ? 'active' : '' }}">
-                <i class="nav-icon fas fa-copy"></i>
+                <i class="nav-icon fas fa-file"></i>
                 <p>
                   Permohonan
                 </p>
@@ -188,7 +189,7 @@
             </li>
             <li class="nav-item">
               <a href="{{route('laporan_nonpermohonan.index')}}" class="nav-link {{ (request()->is('laporan/nonpermohonan*')) ? 'active' : '' }}">
-                <i class="nav-icon fas fa-copy"></i>
+                <i class="nav-icon fas fa-file-alt"></i>
                 <p>
                   Non Permohonan
                 </p>

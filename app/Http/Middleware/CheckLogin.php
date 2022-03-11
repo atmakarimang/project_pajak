@@ -24,11 +24,16 @@ class CheckLogin
         //dd(Session::get('user_id'));
         //dd($request->route());
 
+        $link = substr($request->getPathInfo(), 1);
+
         if (empty(Session::get('user_id'))) {
-            return redirect('/login');
+            //Cek jika akses register akun maka diperbolehkan
+            if ($link == "daftar-akun" || $link == "daftar-akun/create") {
+                return $next($request);
+            } else {
+                return redirect('/login');
+            }
         } else {
-            //return redirect('/dashboard');
-            //return $next($request);
             $link = substr($request->getPathInfo(), 1);
             if ($link == "" || $link == "login") {
                 return redirect('/dashboard');
