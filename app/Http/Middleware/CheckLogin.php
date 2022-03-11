@@ -35,7 +35,7 @@ class CheckLogin
             }
         } else {
             $link = substr($request->getPathInfo(), 1);
-            if ($link == "" || $link == "login") {
+            if ($link == "" || $link == "login" || $link == "daftar-akun" || $link == "daftar-akun/create") {
                 return redirect('/dashboard');
             } else {
                 return $next($request);
