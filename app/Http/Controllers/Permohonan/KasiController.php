@@ -17,6 +17,8 @@ use App\Models\Status;
 use App\Models\Progress;
 use App\Models\KategoriPermohonan;
 use App\Models\Keputusan;
+use App\Models\KriteriaPermohonan;
+use App\Models\PenelaahKeberatan;
 use App\Models\User;
 use DB;
 
@@ -27,6 +29,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class KasiController extends Controller
 {
@@ -187,11 +190,13 @@ class KasiController extends Controller
         $dtPajak = Pajak::get();
         $dtKetetapan = Ketetapan::get();
         $dtKepsek = AnggotaSeksi::get();
+        $dtPenelaah = PenelaahKeberatan::get();
         $dtKatPermohonan = KategoriPermohonan::get();
         $dtSeksiKonsep = SeksiKonseptor::get();
         $dtStatus = Status::get();
         $dtProgress = Progress::get();
         $dtKeputusan = Keputusan::get();
+        $dtKriteria = KriteriaPermohonan::get();
         $data['user'] = $user;
         $data["mode"] = $mode;
         $data['dtAsalPermohonan'] = $dtAsalPermohonan;
@@ -199,11 +204,13 @@ class KasiController extends Controller
         $data['dtPajak'] = $dtPajak;
         $data['dtKetetapan'] = $dtKetetapan;
         $data['dtKepsek'] = $dtKepsek;
+        $data['dtPenelaah'] = $dtPenelaah;
         $data['dtKatPermohonan'] = $dtKatPermohonan;
         $data['dtSeksiKonsep'] = $dtSeksiKonsep;
         $data['dtStatus'] = $dtStatus;
         $data['dtProgress'] = $dtProgress;
         $data['dtKeputusan'] = $dtKeputusan;
+        $data['dtKriteria'] = $dtKriteria;
         $data['dataPB'] = $dataPB;
         //print_r($data);
         return view($this->PATH_VIEW . 'create', $data);
@@ -215,25 +222,52 @@ class KasiController extends Controller
         $error = 0;
         DB::beginTransaction();
 
-        try {
-            $pb = PelaksanaBidang::where('no_agenda', $request->no_agenda)->first();
-            $data = PelaksanaBidang::createKasi($request, $pb);
-        } catch (\Exception $e) {
-            $devError = new DevError;
-            $devError->form = "Add Kasi";
-            $devError->url = $request->path();
-            $devError->error = $e;
-            $devError->data = json_encode($request->input());
-            $devError->created_at = date("Y:m:d H:i:s");
-            $devError->save();
-            DB::commit();
-            $error++;
-            DB::rollBack();
-            $flashs[] = [
-                'type' => 'error', // option : info, warning, success, error
-                'title' => 'Error',
-                'message' => "Kasi gagal disimpan!",
-            ];
+        if ($mode == "edit") {
+            $no_agenda = $request->no_agenda;
+            $pb   = PelaksanaBidang::where('no_agenda', $no_agenda)->first();
+            try {
+                $data = PelaksanaBidang::updateDt($request, $pb);
+                $data = PelaksanaBidang::createKasi($request, $pb);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Update Kasi";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
+                $flashs[] = [
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Kasi gagal disimpan!",
+                ];
+            }
+        } else {
+            $no_agenda = $request->no_agenda;
+            $pb   = PelaksanaBidang::where('no_agenda', $no_agenda)->first();
+            try {
+                $data = PelaksanaBidang::createKasi($request, $pb);
+                $data = PelaksanaBidang::updateDt($request, $pb);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add Kasi";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
+                $flashs[] = [
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Kasi gagal disimpan!",
+                ];
+            }
         }
 
         if ($error == 0) {
@@ -254,7 +288,6 @@ class KasiController extends Controller
         }
 
         $data["flashs"] = $flashs;
-        // return redirect()->back()->with($data);
         return redirect()->route('kasi.index');
     }
     public function print($no_agenda)
@@ -501,20 +534,21 @@ class KasiController extends Controller
         $sheet->setCellValue('X1', 'Nomor Produk Hukum');
         $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
         $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
-        $sheet->setCellValue('AA1', 'Tambah/Kurang');
-        $sheet->setCellValue('AB1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
-        $sheet->setCellValue('AC1', 'Hasil Keputusan');
-        $sheet->setCellValue('AD1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AE1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AF1', 'Nomor Surat Pengantar');
-        $sheet->setCellValue('AG1', 'Tanggal Surat Pengantar');
-        $sheet->setCellValue('AH1', 'Status');
-        $sheet->setCellValue('AI1', 'Progress');
-        $sheet->setCellValue('AJ1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('AK1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('AA1', 'Tambah');
+        $sheet->setCellValue('AB1', 'Kurang');
+        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AD1', 'Hasil Keputusan');
+        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
+        $sheet->setCellValue('AI1', 'Status');
+        $sheet->setCellValue('AJ1', 'Progress');
+        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
 
-        $spreadsheet->getActiveSheet()->getStyle('A1:AK1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        $sheet->getStyle('A1:AK1')->applyFromArray($fontTitle);
+        $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
         $sheet->getRowDimension('4')->setRowHeight(20);
         $last_row = 1;
         foreach ($dataAll as $data) {
@@ -545,17 +579,18 @@ class KasiController extends Controller
             $sheet->setCellValue('X' . $last_row, $data->no_produk_hukum);
             $sheet->setCellValue('Y' . $last_row, date("d-m-Y", strtotime($data->tgl_produk_hukum)));
             $sheet->setCellValue('Z' . $last_row, $data->jml_byr_semula);
-            $sheet->setCellValue('AA' . $last_row, $data->tambah_kurang);
-            $sheet->setCellValue('AB' . $last_row, $data->jml_byr_produk);
-            $sheet->setCellValue('AC' . $last_row, $data->hasil_keputusan);
-            $sheet->setCellValue('AD' . $last_row, $data->no_resi);
-            $sheet->setCellValue('AE' . $last_row, date("d-m-Y", strtotime($data->tgl_resi)));
-            $sheet->setCellValue('AF' . $last_row, $data->no_srt_pengantar);
-            $sheet->setCellValue('AG' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
-            $sheet->setCellValue('AH' . $last_row, $data->status);
-            $sheet->setCellValue('AI' . $last_row, $data->progress);
-            $sheet->setCellValue('AJ' . $last_row, $data->jumlah_byr_pmk);
-            $sheet->setCellValue('AK' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+            $sheet->setCellValue('AA' . $last_row, $data->tambah);
+            $sheet->setCellValue('AB' . $last_row, $data->kurang);
+            $sheet->setCellValue('AC' . $last_row, $data->jml_byr_produk);
+            $sheet->setCellValue('AD' . $last_row, $data->hasil_keputusan);
+            $sheet->setCellValue('AE' . $last_row, $data->no_resi);
+            $sheet->setCellValue('AF' . $last_row, date("d-m-Y", strtotime($data->tgl_resi)));
+            $sheet->setCellValue('AG' . $last_row, $data->no_srt_pengantar);
+            $sheet->setCellValue('AH' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
+            $sheet->setCellValue('AI' . $last_row, $data->status);
+            $sheet->setCellValue('AJ' . $last_row, $data->progress);
+            $sheet->setCellValue('AK' . $last_row, $data->jumlah_byr_pmk);
+            $sheet->setCellValue('AL' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
         }
 
         $header_style_border = [
@@ -574,7 +609,7 @@ class KasiController extends Controller
                 ],
             ]
         ];
-        $sheet->getStyle('A1:AK1')->applyFromArray($header_style_border);
+        $sheet->getStyle('A1:AL1')->applyFromArray($header_style_border);
         header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename="Database Eksekutor.xls');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');

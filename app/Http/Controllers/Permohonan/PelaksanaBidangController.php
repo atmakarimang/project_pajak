@@ -15,6 +15,7 @@ use App\Models\Status;
 use App\Models\Progress;
 use App\Models\SeksiKonseptor;
 use App\Models\KategoriPermohonan;
+use App\Models\KriteriaPermohonan;
 use App\Models\User;
 use DB;
 //use Illuminate\Support\Facades\DB;
@@ -53,6 +54,7 @@ class PelaksanaBidangController extends Controller
         $no_agenda = base64_decode($request->no);
         $data["no_agenda"] = $no_agenda;
         $dtPB = PelaksanaBidang::where('no_agenda', '=', $no_agenda)->first();
+        $dtKriteria = KriteriaPermohonan::get();
         if (empty($dtPB)) {
             $dtPB = new PelaksanaBidang;
         } else {
@@ -84,6 +86,7 @@ class PelaksanaBidangController extends Controller
         $data['dtSeksiKonsep'] = $dtSeksiKonsep;
         $data['dtKatPermohonan'] = $dtKatPermohonan;
         $data['no_agenda'] = $no_agenda;
+        $data['dtKriteria'] = $dtKriteria;
 
         return view($this->PATH_VIEW . 'index', $data);
     }

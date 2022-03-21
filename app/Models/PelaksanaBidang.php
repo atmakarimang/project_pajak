@@ -44,6 +44,7 @@ class PelaksanaBidang extends Model
         $data->progress = $request->progress;
         $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? preg_replace('/[^\d\.]/', '', $request->jumlah_bayar) : 0;
         $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
+        $data->kriteria_permohonan = $request->kriteria_permohonan;
         $data->no = substr($request->no_agenda, 2, 7);
         $data->tahun = date('Y');
         $data->save();
@@ -78,6 +79,8 @@ class PelaksanaBidang extends Model
         $data->progress = $request->progress;
         $data->jumlah_byr_pmk = preg_replace('/[^\d\.]/', '', $request->jumlah_bayar);
         $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
+        $data->kriteria_permohonan = $request->kriteria_permohonan;
+        //dd($data);
         $data->save();
         return $data;
     }
