@@ -113,7 +113,7 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="no_arusdok">No Lembar Pengawasan Arus Dokumen</label>
-                                        <input type="text" id="no_arusdok" name="no_arusdok" class="form-control" value="{{$dataPB->no_lbr_pengawas_dok}}" readonly>
+                                        <input type="text" id="no_arusdok" name="no_arusdok" class="form-control" value="{{$dataPB->no_lbr_pengawas_dok}}">
                                     </div>
                                 </div>
                             </div>
@@ -151,7 +151,15 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="no_npwp">No Pokok Wajib Pajak</label>
-                                        <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dataPB->npwp}}" readonly>
+                                        @php
+                                            //print_r($dataPB->npwp);
+                                        @endphp
+                                        @if(!empty($dataPB->npwp))
+                                            <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dataPB->npwp}}">
+                                        @else
+                                            <input type="text" id="no_npwp" name="no_npwp" class="form-control">
+                                        @endif
+                                        {{-- <input type="text" id="no_npwp" name="no_npwp" class="form-control" placeholder="XX.XXX.XXX.X-XXX.XXX" value="{{$dataPB->npwp}}"> --}}
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -212,7 +220,7 @@
                                             @php
                                                 $tgl = date('d-m-Y', strtotime($dataPB->tgl_ketetapan));
                                             @endphp
-                                            <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input" value="{{$tgl}}" readonly/>
+                                            <input type="text" name="tgl_ketetapan" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                                             <div class="input-group-append">
                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>
@@ -244,7 +252,7 @@
                                 <div class="col-6">
                                 <div class="form-group">
                                     <label for="tahun_pajak">Tahun Pajak</label>
-                                    <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control" value="{{$dataPB->tahun_pajak}}" readonly>
+                                    <input type="text" id="tahun_pajak" name="tahun_pajak" class="form-control year" value="{{$dataPB->tahun_pajak}}">
                                 </div>
                                 </div>
                                 <div class="col-6">
@@ -263,7 +271,7 @@
                                 <div class="col-6">
                                 <div class="form-group">
                                     <label for="no_srt_per">No Surat Permohonan</label>
-                                    <input type="text" id="no_srt_per" name="no_srt_per" class="form-control" value="{{$dataPB->no_srt_permohonan}}" readonly>
+                                    <input type="text" id="no_srt_per" name="no_srt_per" class="form-control" value="{{$dataPB->no_srt_permohonan}}">
                                 </div>
                                 </div>
                                 <div class="col-6">
@@ -273,7 +281,7 @@
                                         @php
                                             $tgl = date('d-m-Y', strtotime($dataPB->tgl_srt_permohonan));
                                         @endphp
-                                        <input type="text" name="tgl_srtper" class="form-control datetimepicker-input" value="{{$tgl}}" readonly/>
+                                        <input type="text" name="tgl_srtper" class="form-control datetimepicker-input datenya" value="{{$tgl}}"/>
                                         <div class="input-group-append">
                                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                         </div>
@@ -349,6 +357,17 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="kriteria_permohonan">Kriteria Permohonan</label>
+                                        <select class="form-control select2bs4" name="kriteria_permohonan" disabled>
+                                            <option selected disabled>Pilih Kriteria Permohonan</option>
+                                            <@foreach($dtKriteria as $dt)
+                                                <option value="{{$dt->kriteria_permohonan}}" {{ ($dataPB->kriteria_permohonan == $dt->kriteria_permohonan) ? "selected" : " " }}>{{$dt->kriteria_permohonan}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -385,8 +404,10 @@
                                         @php
                                             $ex = explode(",",$dataPB->pk_konseptor);
                                         @endphp
-                                        @foreach($dtKepsek as $dt)
-                                            <option value="{{$dt->nama_anggota}}" {{ (in_array($dt->nama_anggota, $ex)) ? "selected" : "" }}>{{$dt->nama_anggota}}</option>
+                                        {{-- @foreach($dtKepsek as $dt) --}}
+                                        @foreach($dtPenelaah as $dt)
+                                            {{-- <option value="{{$dt->nama_anggota}}" {{ (in_array($dt->nama_anggota, $ex)) ? "selected" : "" }}>{{$dt->nama_anggota}}</option> --}}
+                                            <option value="{{$dt->nama_penelaah}}" {{ (in_array($dt->nama_penelaah, $ex)) ? "selected" : "" }}>{{$dt->nama_penelaah}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -571,7 +592,7 @@
                             <div class="col-12 row">
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label>No Surat Pengantar</label>
+                                        <label>Nomor Pengantar SK ke KPP</label>
                                         @if($dataPB->no_srt_pengantar)
                                             <input type="text" id="no_srtpengantar" name="no_srtpengantar" class="form-control" value="{{$dataPB->no_srt_pengantar}}">
                                         @else
@@ -630,6 +651,7 @@
 <!-- InputMask -->
 <script src="{{asset('assets/AdminLTE/plugins/moment/moment.min.js')}}"></script>
 <script src="{{asset('assets/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
 <!-- bs-custom-file-input -->
 <script src="{{asset('assets/AdminLTE/plugins/bs-custom-file-input/bs-custom-file-input.min.js')}}"></script>
 <!-- Bootstrap 4 -->
@@ -665,6 +687,21 @@
 
     });
     $(function () {
+        // XX.XXX.XXX.X-XXX.XXX
+        $('#no_npwp').mask("00.000.000.0-000.000", {placeholder: "__.__.___.___._-___.___"});
+
+        //Tgl
+        $('.datenya').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd-mm-yyyy'
+        });
+
+        $('.year').datepicker({
+            minViewMode: 2,
+            format: 'yyyy'
+        });
+
         //Initialize Select2 Elements
         $('.select2bs4').select2({
         theme: 'bootstrap4'

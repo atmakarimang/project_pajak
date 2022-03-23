@@ -433,7 +433,20 @@
                               </div>
                             </div>
                           </div>
+                        </div> 
+                        <div class="col-6">
+                          <div class="form-group">
+                              <label for="kriteria_permohonan">Kriteria Permohonan</label>
+                              <select class="form-control select2bs4" name="kriteria_permohonan" disabled>
+                                  <option selected disabled>Pilih Kriteria Permohonan</option>
+                                  <@foreach($dtKriteria as $dt)
+                                      <option value="{{$dt->kriteria_permohonan}}" {{ ($dtPB->kriteria_permohonan == $dt->kriteria_permohonan) ? "selected" : " " }}>{{$dt->kriteria_permohonan}}</option>
+                                  @endforeach
+                              </select>
+                          </div>
                         </div>
+                      </div>  
+                      <div class="col-12 row"> 
                         <div class="col-6">
                           <div class="card-footer hideread">
                             @if($mode=='edit')
