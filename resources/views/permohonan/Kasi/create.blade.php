@@ -229,21 +229,23 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label for="jenis_ketetapan">Masa Pajak</label>
-                                        <select class="form-control select2bs4" name="jenis_ketetapan" disabled>
-                                            <option selected disabled>Pilih Masa Pajak</option>
-                                            <option value="Januari" {{ ($dataPB->masa_pajak == 'Januari') ? "selected" : "" }}>Januari</option>
-                                            <option value="Februari" {{ ($dataPB->masa_pajak == 'Februari') ? "selected" : "" }}>Februari</option>
-                                            <option value="Maret" {{ ($dataPB->masa_pajak == 'Maret') ? "selected" : "" }}>Maret</option>
-                                            <option value="April" {{ ($dataPB->masa_pajak == 'April') ? "selected" : "" }}>April</option>
-                                            <option value="Mei" {{ ($dataPB->masa_pajak == 'Mei') ? "selected" : "" }}>Mei</option>
-                                            <option value="Juni" {{ ($dataPB->masa_pajak == 'Juni') ? "selected" : "" }}>Juni</option>
-                                            <option value="Juli" {{ ($dataPB->masa_pajak == 'Juli') ? "selected" : "" }}>Juli</option>
-                                            <option value="Agustus" {{ ($dataPB->masa_pajak == 'Agustus') ? "selected" : "" }}>Agustus</option>
-                                            <option value="September" {{ ($dataPB->masa_pajak == 'September') ? "selected" : "" }}>September</option>
-                                            <option value="Oktober" {{ ($dataPB->masa_pajak == 'Oktober') ? "selected" : "" }}>Oktober</option>
-                                            <option value="November" {{ ($dataPB->masa_pajak == 'November') ? "selected" : "" }}>November</option>
-                                            <option value="Desember" {{ ($dataPB->masa_pajak == 'Desember') ? "selected" : "" }}>Desember</option>
+                                        <label for="masa_pajak">Masa Pajak</label>
+                                        <select class="form-control select2bs4" multiple="multiple" name="masa_pajak[]" disabled>
+                                            @php
+                                                $ex = explode(",",$dataPB->masa_pajak);
+                                            @endphp
+                                            <option value="Januari" {{ (in_array("Januari", $ex)) ? "selected" : "" }}>Januari</option>
+                                            <option value="Februari" {{ (in_array("Februari", $ex)) ? "selected" : "" }}>Februari</option>
+                                            <option value="Maret" {{ (in_array("Maret", $ex)) ? "selected" : "" }}>Maret</option>
+                                            <option value="April" {{ (in_array("April", $ex)) ? "selected" : "" }}>April</option>
+                                            <option value="Mei" {{ (in_array("Mei", $ex)) ? "selected" : "" }}>Mei</option>
+                                            <option value="Juni" {{ (in_array("Juni", $ex)) ? "selected" : "" }}>Juni</option>
+                                            <option value="Juli" {{ (in_array("Juli", $ex)) ? "selected" : "" }}>Juli</option>
+                                            <option value="Agustus" {{ (in_array("Agustus", $ex)) ? "selected" : "" }}>Agustus</option>
+                                            <option value="September" {{ (in_array("September", $ex)) ? "selected" : "" }}>September</option>
+                                            <option value="Oktober" {{ (in_array("Oktober", $ex)) ? "selected" : "" }}>Oktober</option>
+                                            <option value="November" {{ (in_array("November", $ex)) ? "selected" : "" }}>November</option>
+                                            <option value="Desember" {{ (in_array("Desember", $ex)) ? "selected" : "" }}>Desember</option>
                                         </select>
                                     </div>
                                 </div>

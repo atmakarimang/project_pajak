@@ -88,6 +88,7 @@ class PelaksanaBidang extends Model
         $jbp  = floatval(str_replace(',', '.', str_replace('.', '', $request->jumlah_bayar)));
         $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? $jbp : 0;
         $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
+        // dd($data);
         $data->save();
         return $data;
     }
