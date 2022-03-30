@@ -14,7 +14,7 @@ use App\Models\PelaksanaBidang;
 use App\Models\Status;
 use App\Models\Progress;
 use App\Models\SeksiKonseptor;
-use App\Models\AnggotaSeksi;
+use App\Models\PenelaahKeberatan;
 use App\Models\KategoriPermohonan;
 use App\Models\User;
 use DB;
@@ -37,21 +37,23 @@ class LaporanPermohonanController extends Controller
         // dd($this->middleware('auth'));
         // $this->middleware('auth');
     }
-    public function index(Request $request){ 
+    public function index(Request $request)
+    {
         $user = Auth::user();
         $dtJnsPermohonan = JenisPermohonan::get();
         $dtSK = SeksiKonseptor::get();
-        $dtKepsek = AnggotaSeksi::get();
-        $dtStatus = Status::where('status','<>','Diarsipkan')->where('status','<>','Ditindaklanjuti')->get();
+        $dtKepsek = PenelaahKeberatan::get();
+        $dtStatus = Status::where('status', '<>', 'Diarsipkan')->where('status', '<>', 'Ditindaklanjuti')->get();
         $data['user'] = $user;
         $data['dtJnsPermohonan'] = $dtJnsPermohonan;
         $data['dtSK'] = $dtSK;
         $data['dtKepsek'] = $dtKepsek;
         $data['dtStatus'] = $dtStatus;
-        return view($this->PATH_VIEW.'index',$data);
+        return view($this->PATH_VIEW . 'index', $data);
     }
-    
-    public function ajaxDataPB(Request $request){
+
+    public function ajaxDataPB(Request $request)
+    {
         $start = $request->input('start');
         $length = $request->input('length');
         $draw = $request->input('draw');
@@ -64,67 +66,66 @@ class LaporanPermohonanController extends Controller
         $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
         $orderType = $order_arr['dir']; // ASC or DESC
         $orderBy = $request->input('columns');
-        $orderBy = $orderBy[$orderByColumnIndex]['name'];//Get name of the sorting column from its index
+        $orderBy = $orderBy[$orderByColumnIndex]['name']; //Get name of the sorting column from its index
         $limit = $length;
         $offset = $start;
-        
+
         $jenis_pmh = $request->jenis_pmh;
-        $seksi_konseptor = $request->seksi_konseptor; 
-        $pk_konseptor = $request->pk_konseptor; 
-        $jatuh_tempo = $request->jatuh_tempo; 
+        $seksi_konseptor = $request->seksi_konseptor;
+        $pk_konseptor = $request->pk_konseptor;
+        $jatuh_tempo = $request->jatuh_tempo;
         $tgl_awal = $request->tgl_awal;
         $tgl_akhir = $request->tgl_akhir;
-        $status = $request->status; 
+        $status = $request->status;
 
         // dd($jenis_pmh,$seksi_konseptor,$pk_konseptor,$jatuh_tempo,$status);
         $jpm = '';
-        if($jenis_pmh !='-'){
-            $jpm = " AND JENIS_PERMOHONAN = '".$jenis_pmh."'";
+        if ($jenis_pmh != '-') {
+            $jpm = " AND JENIS_PERMOHONAN = '" . $jenis_pmh . "'";
         }
         $sk = '';
-        if($seksi_konseptor !='-'){
-            $sk = "AND SEKSI_KONSEPTOR LIKE '%".$seksi_konseptor."%'";
+        if ($seksi_konseptor != '-') {
+            $sk = "AND SEKSI_KONSEPTOR LIKE '%" . $seksi_konseptor . "%'";
         }
         $pk = '';
-        if($pk_konseptor !='-'){
-            $pk = "AND PK_KONSEPTOR = '".$pk_konseptor."'";
+        if ($pk_konseptor != '-') {
+            $pk = "AND PK_KONSEPTOR = '" . $pk_konseptor . "'";
         }
         $stts = '';
-        if($status !='-'){
-            $stts = "AND STATUS = '".$status."'";
+        if ($status != '-') {
+            $stts = "AND STATUS = '" . $status . "'";
         }
-        $filter = $jpm." ".$sk." ".$pk." ".$stts;
+        $filter = $jpm . " " . $sk . " " . $pk . " " . $stts;
         // dd($filter);
-        $jumlahTotal = PelaksanaBidang::where('status_dokumen','<>','Delete')
-                    ->orWhereNull('status_dokumen')
-                    ->count();
-        
+        $jumlahTotal = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+            ->orWhereNull('status_dokumen')
+            ->count();
+
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
             OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
             OR pajak like lower('%{$search}%') OR no_ketetapan like lower('%{$search}%')
             OR seksi_konseptor like lower('%{$search}%') OR progress like lower('%{$search}%') OR status like lower('%{$search}%')";
-            $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}") ->count(); //hitung data yang telah terfilter
-            if($orderBy !=null){
+            $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
+            if ($orderBy != null) {
                 $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
                     ->whereRaw($where)->orderBy($orderBy, $orderType)->get();
-            }else{
+            } else {
                 $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
                     ->whereRaw($where)->get();
             }
-            
         } else {
             $jumlahFiltered = $jumlahTotal;
-            if($orderBy !=null){
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')
+            if ($orderBy != null) {
+                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')
                     ->offset($offset)
-                    ->limit($limit)->orderBy($orderBy,$orderType)->get();
-            }else{
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')
+                    ->limit($limit)->orderBy($orderBy, $orderType)->get();
+            } else {
+                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')
                     ->offset($offset)
                     ->limit($limit)
                     ->get();
-                
+
                 // $data = PelaksanaBidang::where('status_dokumen','<>','Delete')
                 //     ->orWhereNull('status_dokumen')
                 //     ->offset($offset)
@@ -136,46 +137,46 @@ class LaporanPermohonanController extends Controller
             $keberatan = stripos($dt->jenis_permohonan, 'keberatan');
             //MR != keberatan 3bln, = keberatan 8bln
             $tgl_diterima_kpp = date('d-m-Y', strtotime($dt->tgl_diterima_kpp));
-            $d_mr = strtotime("+3 months",strtotime($dt->tgl_diterima_kpp));
-            $d_mrk = strtotime("+8 months",strtotime($dt->tgl_diterima_kpp));
+            $d_mr = strtotime("+3 months", strtotime($dt->tgl_diterima_kpp));
+            $d_mrk = strtotime("+8 months", strtotime($dt->tgl_diterima_kpp));
             //IKU != keberatan 5bln, = keberatan 10bln
-            $d_iku = strtotime("+5 months",strtotime($dt->tgl_diterima_kpp));
-            $d_ikuk = strtotime("+10 months",strtotime($dt->tgl_diterima_kpp));
+            $d_iku = strtotime("+5 months", strtotime($dt->tgl_diterima_kpp));
+            $d_ikuk = strtotime("+10 months", strtotime($dt->tgl_diterima_kpp));
             //KUP != keberatan 6bln, = keberatan 12bln
-            $d_kup = strtotime("+6 months",strtotime($dt->tgl_diterima_kpp));
-            $d_kupk = strtotime("+12 months",strtotime($dt->tgl_diterima_kpp));
+            $d_kup = strtotime("+6 months", strtotime($dt->tgl_diterima_kpp));
+            $d_kupk = strtotime("+12 months", strtotime($dt->tgl_diterima_kpp));
             if ($keberatan != "") { // == keberatan
-                $jt_mr = date("d-m-Y",$d_mrk);
-                $jt_iku = date("d-m-Y",$d_ikuk);
-                $jt_kup = date("d-m-Y",$d_kupk);
+                $jt_mr = date("d-m-Y", $d_mrk);
+                $jt_iku = date("d-m-Y", $d_ikuk);
+                $jt_kup = date("d-m-Y", $d_kupk);
             } else { // !=keberatan
-                $jt_mr = date("d-m-Y",$d_mr);
-                $jt_iku = date("d-m-Y",$d_iku);
-                $jt_kup = date("d-m-Y",$d_kup);
+                $jt_mr = date("d-m-Y", $d_mr);
+                $jt_iku = date("d-m-Y", $d_iku);
+                $jt_kup = date("d-m-Y", $d_kup);
             }
-            
-            if($dt->status == 'Selesai'){
-               $badge = 'badge-success';
-            }else if($dt->status == 'Tunggakan'){
-               $badge = 'badge-danger';
-            }else if($dt->status == 'Kembali'){
-               $badge = 'badge-warning';
-            }else{
-               $badge = 'badge-info';
+
+            if ($dt->status == 'Selesai') {
+                $badge = 'badge-success';
+            } else if ($dt->status == 'Tunggakan') {
+                $badge = 'badge-danger';
+            } else if ($dt->status == 'Kembali') {
+                $badge = 'badge-warning';
+            } else {
+                $badge = 'badge-info';
             }
             $status = '<center>
-                            <span class="badge '.$badge.'">'.$dt->status.'</span>
+                            <span class="badge ' . $badge . '">' . $dt->status . '</span>
                         </center>';
 
-            $linkedit = url('/permohonan/pelaksana-bidang?mode=edit&no='.base64_encode($dt->no_agenda).'&readonly=1');
+            $linkedit = url('/permohonan/pelaksana-bidang?mode=edit&no=' . base64_encode($dt->no_agenda) . '&readonly=1');
             $action = '<center>
-                            <a href="'.$linkedit.'" target="_blank">
+                            <a href="' . $linkedit . '" target="_blank">
                                 <button data-toggle="tooltip" title="Lihat Dokumen" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-search"></i></button>
                             </a>
                         </center>';
-            
+
             $result[] = [
-                $start+$no+1,
+                $start + $no + 1,
                 $dt->no_agenda,
                 $tgl_diterima_kpp,
                 $dt->npwp,
@@ -193,7 +194,8 @@ class LaporanPermohonanController extends Controller
             ];
         }
         echo json_encode(
-            array('draw' => $draw,
+            array(
+                'draw' => $draw,
                 'recordsTotal' => $jumlahTotal,
                 'recordsFiltered' => $jumlahFiltered,
                 'data' => $result,
@@ -201,35 +203,36 @@ class LaporanPermohonanController extends Controller
         );
     }
 
-    public function print(Request $request){
+    public function print(Request $request)
+    {
         $jenis_pmh = $request->jenis_pmh;
-        $seksi_konseptor = $request->seksi_konseptor; 
-        $pk_konseptor = $request->pk_konseptor; 
-        $jatuh_tempo = $request->jatuh_tempo; 
+        $seksi_konseptor = $request->seksi_konseptor;
+        $pk_konseptor = $request->pk_konseptor;
+        $jatuh_tempo = $request->jatuh_tempo;
         $tgl_awal = $request->tgl_awal;
         $tgl_akhir = $request->tgl_akhir;
-        $status = $request->status; 
+        $status = $request->status;
 
         // dd($jenis_pmh,$seksi_konseptor,$pk_konseptor,$jatuh_tempo,$status);
         $jpm = '';
-        if($jenis_pmh !='-'){
-            $jpm = " AND JENIS_PERMOHONAN = '".$jenis_pmh."'";
+        if ($jenis_pmh != '-') {
+            $jpm = " AND JENIS_PERMOHONAN = '" . $jenis_pmh . "'";
         }
         $sk = '';
-        if($seksi_konseptor !='-'){
-            $sk = "AND SEKSI_KONSEPTOR LIKE '%".$seksi_konseptor."%'";
+        if ($seksi_konseptor != '-') {
+            $sk = "AND SEKSI_KONSEPTOR LIKE '%" . $seksi_konseptor . "%'";
         }
         $pk = '';
-        if($pk_konseptor !='-'){
-            $pk = "AND PK_KONSEPTOR = '".$pk_konseptor."'";
+        if ($pk_konseptor != '-') {
+            $pk = "AND PK_KONSEPTOR = '" . $pk_konseptor . "'";
         }
         $stts = '';
-        if($status !='-'){
-            $stts = "AND STATUS = '".$status."'";
+        if ($status != '-') {
+            $stts = "AND STATUS = '" . $status . "'";
         }
-        $filter = $jpm." ".$sk." ".$pk." ".$stts;
+        $filter = $jpm . " " . $sk . " " . $pk . " " . $stts;
 
-        $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')->get();
+        $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')->get();
         // dd($data);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -275,7 +278,7 @@ class LaporanPermohonanController extends Controller
         $sheet->getColumnDimension('M')->setWidth(16);
         //header end
         //DETAILS
-        
+
         $sheet->setCellValue('A6', 'No Agenda');
         $sheet->setCellValue('B6', 'Tanggal diterima KPP');
         $sheet->setCellValue('C6', 'NPWP');
@@ -309,44 +312,44 @@ class LaporanPermohonanController extends Controller
             ->getStartColor()->setARGB('FF008000');
         $sheet->getStyle('A6:M6')->applyFromArray($fontTitle);
         $sheet->getStyle('K7:M7')->applyFromArray($fontTitle);
-        
+
         $sheet->getRowDimension('4')->setRowHeight(20);
         $last_row = 7;
         foreach ($data as $key => $dt) {
             $keberatan = stripos($dt->jenis_permohonan, 'keberatan');
             //MR != keberatan 3bln, = keberatan 8bln
             $tgl_diterima_kpp = date('d-m-Y', strtotime($dt->tgl_diterima_kpp));
-            $d_mr = strtotime("+3 months",strtotime($dt->tgl_diterima_kpp));
-            $d_mrk = strtotime("+8 months",strtotime($dt->tgl_diterima_kpp));
+            $d_mr = strtotime("+3 months", strtotime($dt->tgl_diterima_kpp));
+            $d_mrk = strtotime("+8 months", strtotime($dt->tgl_diterima_kpp));
             //IKU != keberatan 5bln, = keberatan 10bln
-            $d_iku = strtotime("+5 months",strtotime($dt->tgl_diterima_kpp));
-            $d_ikuk = strtotime("+10 months",strtotime($dt->tgl_diterima_kpp));
+            $d_iku = strtotime("+5 months", strtotime($dt->tgl_diterima_kpp));
+            $d_ikuk = strtotime("+10 months", strtotime($dt->tgl_diterima_kpp));
             //KUP != keberatan 6bln, = keberatan 12bln
-            $d_kup = strtotime("+6 months",strtotime($dt->tgl_diterima_kpp));
-            $d_kupk = strtotime("+12 months",strtotime($dt->tgl_diterima_kpp));
+            $d_kup = strtotime("+6 months", strtotime($dt->tgl_diterima_kpp));
+            $d_kupk = strtotime("+12 months", strtotime($dt->tgl_diterima_kpp));
             if ($keberatan != "") { // == keberatan
-                $jt_mr = date("d-m-Y",$d_mrk);
-                $jt_iku = date("d-m-Y",$d_ikuk);
-                $jt_kup = date("d-m-Y",$d_kupk);
+                $jt_mr = date("d-m-Y", $d_mrk);
+                $jt_iku = date("d-m-Y", $d_ikuk);
+                $jt_kup = date("d-m-Y", $d_kupk);
             } else { // !=keberatan
-                $jt_mr = date("d-m-Y",$d_mr);
-                $jt_iku = date("d-m-Y",$d_iku);
-                $jt_kup = date("d-m-Y",$d_kup);
+                $jt_mr = date("d-m-Y", $d_mr);
+                $jt_iku = date("d-m-Y", $d_iku);
+                $jt_kup = date("d-m-Y", $d_kup);
             }
             $last_row++;
-            $sheet->setCellValue('A'.$last_row, $dt->no_agenda);
-            $sheet->setCellValue('B'.$last_row, $tgl_diterima_kpp);
-            $sheet->setCellValue('C'.$last_row, $dt->npwp);
-            $sheet->setCellValue('D'.$last_row, $dt->nama_wajib_pajak);
-            $sheet->setCellValue('E'.$last_row, $dt->jenis_permohonan);
-            $sheet->setCellValue('F'.$last_row, $dt->no_ketetapan);
-            $sheet->setCellValue('G'.$last_row, $dt->seksi_konseptor);
-            $sheet->setCellValue('H'.$last_row, $dt->kepala_seksi);
-            $sheet->setCellValue('I'.$last_row, $dt->pk_konseptor);
-            $sheet->setCellValue('J'.$last_row, $dt->status);
-            $sheet->setCellValue('K'.$last_row, $jt_mr);
-            $sheet->setCellValue('L'.$last_row, $jt_iku);
-            $sheet->setCellValue('M'.$last_row, $jt_kup);
+            $sheet->setCellValue('A' . $last_row, $dt->no_agenda);
+            $sheet->setCellValue('B' . $last_row, $tgl_diterima_kpp);
+            $sheet->setCellValue('C' . $last_row, $dt->npwp);
+            $sheet->setCellValue('D' . $last_row, $dt->nama_wajib_pajak);
+            $sheet->setCellValue('E' . $last_row, $dt->jenis_permohonan);
+            $sheet->setCellValue('F' . $last_row, $dt->no_ketetapan);
+            $sheet->setCellValue('G' . $last_row, $dt->seksi_konseptor);
+            $sheet->setCellValue('H' . $last_row, $dt->kepala_seksi);
+            $sheet->setCellValue('I' . $last_row, $dt->pk_konseptor);
+            $sheet->setCellValue('J' . $last_row, $dt->status);
+            $sheet->setCellValue('K' . $last_row, $jt_mr);
+            $sheet->setCellValue('L' . $last_row, $jt_iku);
+            $sheet->setCellValue('M' . $last_row, $jt_kup);
         }
         $header_style_border = [
             'borders' => [

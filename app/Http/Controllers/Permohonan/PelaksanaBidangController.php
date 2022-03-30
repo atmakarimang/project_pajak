@@ -15,7 +15,6 @@ use App\Models\Status;
 use App\Models\Progress;
 use App\Models\SeksiKonseptor;
 use App\Models\KategoriPermohonan;
-use App\Models\KriteriaPermohonan;
 use App\Models\User;
 use DB;
 //use Illuminate\Support\Facades\DB;
@@ -54,7 +53,6 @@ class PelaksanaBidangController extends Controller
         $no_agenda = base64_decode($request->no);
         $data["no_agenda"] = $no_agenda;
         $dtPB = PelaksanaBidang::where('no_agenda', '=', $no_agenda)->first();
-        $dtKriteria = KriteriaPermohonan::get();
         if (empty($dtPB)) {
             $dtPB = new PelaksanaBidang;
         } else {
@@ -86,7 +84,6 @@ class PelaksanaBidangController extends Controller
         $data['dtSeksiKonsep'] = $dtSeksiKonsep;
         $data['dtKatPermohonan'] = $dtKatPermohonan;
         $data['no_agenda'] = $no_agenda;
-        $data['dtKriteria'] = $dtKriteria;
 
         return view($this->PATH_VIEW . 'index', $data);
     }
@@ -198,8 +195,9 @@ class PelaksanaBidangController extends Controller
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
             OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
-            OR pajak like lower('%{$search}%') OR no_ketetapan like lower('%{$search}%')
-            OR seksi_konseptor like lower('%{$search}%') OR progress like lower('%{$search}%') OR status like lower('%{$search}%')";
+            OR no_ketetapan like lower('%{$search}%') OR no_produk_hukum like lower('%{$search}%') 
+            OR tgl_produk_hukum like lower('%{$search}%') OR pk_konseptor like lower('%{$search}%')
+            OR hasil_keputusan like lower('%{$search}%') OR status like lower('%{$search}%')";
             $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
             if ($orderBy != null) {
                 $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
@@ -229,15 +227,15 @@ class PelaksanaBidangController extends Controller
             if ($user->peran == 'Eksekutor') {
                 $action = '<center>
                             <a href="' . $linkedit . '">
-                                <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
+                                <button data-toggle="tooltip" title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
                             </a>
                             </center>';
             } else if ($user->peran == 'Forecaster') {
                 $action = '<center>
                             <a href="' . $linkedit . '">
-                                <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
+                                <button data-toggle="tooltip" title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
                             </a>
-                            <button onclick="buttonDelete(this)" data-link="' . $linkdelete . '" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
+                            <button onclick="buttonDelete(this)" data-link="' . $linkdelete . '" data-toggle="tooltip" title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
                         </center>';
             }
 
@@ -264,17 +262,37 @@ class PelaksanaBidangController extends Controller
             $status = '<center>
                             <span class="badge ' . $badge . '">' . $dt->status . '</span>
                         </center>';
+
+            if ($dt->hasil_keputusan == 'Diterima') {
+                $badgekep = 'badge-success';
+            } else if ($dt->hasil_keputusan == 'Ditolak') {
+                $badgekep = 'badge-danger';
+            } else if ($dt->hasil_keputusan == 'Dicabut') {
+                $badgekep = 'badge-warning';
+            } else if ($dt->hasil_keputusan == 'Tolak Formal') {
+                $badgekep = 'badge-dark';
+            } else if ($dt->hasil_keputusan == 'Sebagian') {
+                $badgekep = 'badge-secondary';
+            } else {
+                $badgekep = 'badge-info';
+            }
+
+            $hasil_kep = '<center>
+                            <span class="badge ' . $badge . '">' . $dt->hasil_keputusan . '</span>
+                        </center>';
+
             $result[] = [
                 $start + $no + 1,
                 $dt->no_agenda,
                 $dt->npwp,
                 $dt->nama_wajib_pajak,
                 $dt->jenis_permohonan,
-                $dt->pajak,
                 $dt->no_ketetapan,
-                $dt->seksi_konseptor,
-                $progress,
+                $dt->pk_konseptor,
+                $dt->no_produk_hukum,
+                $dt->tgl_produk_hukum,
                 $status,
+                $hasil_kep,
                 $action,
             ];
         }
@@ -372,13 +390,26 @@ class PelaksanaBidangController extends Controller
         $sheet->setCellValue('S1', 'Nomor Surat Permohonan');
         $sheet->setCellValue('T1', 'Tanggal Surat Permohonan');
         $sheet->setCellValue('U1', 'Seksi Konseptor');
-        $sheet->setCellValue('V1', 'Status');
-        $sheet->setCellValue('W1', 'Progress');
-        $sheet->setCellValue('X1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('Y1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('V1', 'Kepala Seksi');
+        $sheet->setCellValue('W1', 'PK Konseptor');
+        $sheet->setCellValue('X1', 'Nomor Produk Hukum');
+        $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
+        $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
+        $sheet->setCellValue('AA1', 'Tambah');
+        $sheet->setCellValue('AB1', 'Kurang');
+        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AD1', 'Hasil Keputusan');
+        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
+        $sheet->setCellValue('AI1', 'Status');
+        $sheet->setCellValue('AJ1', 'Progress');
+        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
 
-        $spreadsheet->getActiveSheet()->getStyle('A1:Y1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        $sheet->getStyle('A1:Y1')->applyFromArray($fontTitle);
+        $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
         $sheet->getRowDimension('4')->setRowHeight(20);
 
         $sheet->setCellValue('A2', $data->no_agenda);
@@ -402,10 +433,23 @@ class PelaksanaBidangController extends Controller
         $sheet->setCellValue('S2', $data->no_srt_permohonan);
         $sheet->setCellValue('T2', date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
         $sheet->setCellValue('U2', $data->seksi_konseptor);
-        $sheet->setCellValue('V2', $data->status);
-        $sheet->setCellValue('W2', $data->progress);
-        $sheet->setCellValue('X2', $data->jumlah_byr_pmk);
-        $sheet->setCellValue('Y2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+        $sheet->setCellValue('V2', $data->kepala_seksi);
+        $sheet->setCellValue('W2', $data->pk_konseptor);
+        $sheet->setCellValue('X2', $data->no_produk_hukum);
+        $sheet->setCellValue('Y2', date("d-m-Y", strtotime($data->tgl_produk_hukum)));
+        $sheet->setCellValue('Z2', $data->jml_byr_semula);
+        $sheet->setCellValue('AA2', $data->tambah);
+        $sheet->setCellValue('AB2', $data->kurang);
+        $sheet->setCellValue('AC2', $data->jml_byr_produk);
+        $sheet->setCellValue('AD2', $data->hasil_keputusan);
+        $sheet->setCellValue('AE2', $data->no_resi);
+        $sheet->setCellValue('AF2', date("d-m-Y", strtotime($data->tgl_resi)));
+        $sheet->setCellValue('AG2', $data->no_srt_pengantar);
+        $sheet->setCellValue('AH2', date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
+        $sheet->setCellValue('AI2', $data->status);
+        $sheet->setCellValue('AJ2', $data->progress);
+        $sheet->setCellValue('AK2', $data->jumlah_byr_pmk);
+        $sheet->setCellValue('AL2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
 
         $header_style_border = [
             'borders' => [
@@ -423,7 +467,7 @@ class PelaksanaBidangController extends Controller
                 ],
             ]
         ];
-        $sheet->getStyle('A1:Y1')->applyFromArray($header_style_border);
+        $sheet->getStyle('A1:AL1')->applyFromArray($header_style_border);
         header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename="Forecaster ' . $noagen . '.xls');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
@@ -511,13 +555,26 @@ class PelaksanaBidangController extends Controller
         $sheet->setCellValue('S1', 'Nomor Surat Permohonan');
         $sheet->setCellValue('T1', 'Tanggal Surat Permohonan');
         $sheet->setCellValue('U1', 'Seksi Konseptor');
-        $sheet->setCellValue('V1', 'Status');
-        $sheet->setCellValue('W1', 'Progress');
-        $sheet->setCellValue('X1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('Y1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('V1', 'Kepala Seksi');
+        $sheet->setCellValue('W1', 'PK Konseptor');
+        $sheet->setCellValue('X1', 'Nomor Produk Hukum');
+        $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
+        $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
+        $sheet->setCellValue('AA1', 'Tambah');
+        $sheet->setCellValue('AB1', 'Kurang');
+        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AD1', 'Hasil Keputusan');
+        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
+        $sheet->setCellValue('AI1', 'Status');
+        $sheet->setCellValue('AJ1', 'Progress');
+        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
 
-        $spreadsheet->getActiveSheet()->getStyle('A1:Y1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        $sheet->getStyle('A1:Y1')->applyFromArray($fontTitle);
+        $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
         $sheet->getRowDimension('4')->setRowHeight(20);
         $last_row = 1;
         foreach ($dataAll as $data) {
@@ -543,10 +600,23 @@ class PelaksanaBidangController extends Controller
             $sheet->setCellValue('S' . $last_row, $data->no_srt_permohonan);
             $sheet->setCellValue('T' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
             $sheet->setCellValue('U' . $last_row, $data->seksi_konseptor);
-            $sheet->setCellValue('V' . $last_row, $data->status);
-            $sheet->setCellValue('W' . $last_row, $data->progress);
-            $sheet->setCellValue('X' . $last_row, $data->jumlah_byr_pmk);
-            $sheet->setCellValue('Y' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+            $sheet->setCellValue('V' . $last_row, $data->kepala_seksi);
+            $sheet->setCellValue('W' . $last_row, $data->pk_konseptor);
+            $sheet->setCellValue('X' . $last_row, $data->no_produk_hukum);
+            $sheet->setCellValue('Y' . $last_row, date("d-m-Y", strtotime($data->tgl_produk_hukum)));
+            $sheet->setCellValue('Z' . $last_row, $data->jml_byr_semula);
+            $sheet->setCellValue('AA' . $last_row, $data->tambah);
+            $sheet->setCellValue('AB' . $last_row, $data->kurang);
+            $sheet->setCellValue('AC' . $last_row, $data->jml_byr_produk);
+            $sheet->setCellValue('AD' . $last_row, $data->hasil_keputusan);
+            $sheet->setCellValue('AE' . $last_row, $data->no_resi);
+            $sheet->setCellValue('AF' . $last_row, date("d-m-Y", strtotime($data->tgl_resi)));
+            $sheet->setCellValue('AG' . $last_row, $data->no_srt_pengantar);
+            $sheet->setCellValue('AH' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
+            $sheet->setCellValue('AI' . $last_row, $data->status);
+            $sheet->setCellValue('AJ' . $last_row, $data->progress);
+            $sheet->setCellValue('AK' . $last_row, $data->jumlah_byr_pmk);
+            $sheet->setCellValue('AL' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
         }
 
         $header_style_border = [
@@ -565,7 +635,7 @@ class PelaksanaBidangController extends Controller
                 ],
             ]
         ];
-        $sheet->getStyle('A1:Y1')->applyFromArray($header_style_border);
+        $sheet->getStyle('A1:AL1')->applyFromArray($header_style_border);
         header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename="Database Forecaster.xls');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');

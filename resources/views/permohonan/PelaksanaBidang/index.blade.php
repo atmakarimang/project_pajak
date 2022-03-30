@@ -278,20 +278,22 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_ketetapan">Masa Pajak</label>
-                            <select class="form-control select2bs4" name="masa_pajak" required>
-                                <option selected disabled>Pilih Masa Pajak</option>
-                                <option value="Januari" {{ ($dtPB->masa_pajak == 'Januari') ? "selected" : "" }}>Januari</option>
-                                <option value="Februari" {{ ($dtPB->masa_pajak == 'Februari') ? "selected" : "" }}>Februari</option>
-                                <option value="Maret" {{ ($dtPB->masa_pajak == 'Maret') ? "selected" : "" }}>Maret</option>
-                                <option value="April" {{ ($dtPB->masa_pajak == 'April') ? "selected" : "" }}>April</option>
-                                <option value="Mei" {{ ($dtPB->masa_pajak == 'Mei') ? "selected" : "" }}>Mei</option>
-                                <option value="Juni" {{ ($dtPB->masa_pajak == 'Juni') ? "selected" : "" }}>Juni</option>
-                                <option value="Juli" {{ ($dtPB->masa_pajak == 'Juli') ? "selected" : "" }}>Juli</option>
-                                <option value="Agustus" {{ ($dtPB->masa_pajak == 'Agustus') ? "selected" : "" }}>Agustus</option>
-                                <option value="September" {{ ($dtPB->masa_pajak == 'September') ? "selected" : "" }}>September</option>
-                                <option value="Oktober" {{ ($dtPB->masa_pajak == 'Oktober') ? "selected" : "" }}>Oktober</option>
-                                <option value="November" {{ ($dtPB->masa_pajak == 'November') ? "selected" : "" }}>November</option>
-                                <option value="Desember" {{ ($dtPB->masa_pajak == 'Desember') ? "selected" : "" }}>Desember</option>
+                            <select class="form-control select2bs4" multiple="multiple" name="masa_pajak[]" required>
+                              @php
+                                $ex = explode(",",$dtPB->masa_pajak);
+                              @endphp
+                                <option value="Januari" {{ (in_array("Januari", $ex)) ? "selected" : "" }}>Januari</option>
+                                <option value="Februari" {{ (in_array("Februari", $ex)) ? "selected" : "" }}>Februari</option>
+                                <option value="Maret" {{ (in_array("Maret", $ex)) ? "selected" : "" }}>Maret</option>
+                                <option value="April" {{ (in_array("April", $ex)) ? "selected" : "" }}>April</option>
+                                <option value="Mei" {{ (in_array("Mei", $ex)) ? "selected" : "" }}>Mei</option>
+                                <option value="Juni" {{ (in_array("Juni", $ex)) ? "selected" : "" }}>Juni</option>
+                                <option value="Juli" {{ (in_array("Juli", $ex)) ? "selected" : "" }}>Juli</option>
+                                <option value="Agustus" {{ (in_array("Agustus", $ex)) ? "selected" : "" }}>Agustus</option>
+                                <option value="September" {{ (in_array("September", $ex)) ? "selected" : "" }}>September</option>
+                                <option value="Oktober" {{ (in_array("Oktober", $ex)) ? "selected" : "" }}>Oktober</option>
+                                <option value="November" {{ (in_array("November", $ex)) ? "selected" : "" }}>November</option>
+                                <option value="Desember" {{ (in_array("Desember", $ex)) ? "selected" : "" }}>Desember</option>
                             </select>
                           </div>
                         </div>
@@ -397,11 +399,14 @@
                           <div class="form-group">
                             <label for="jumlah_bayar">Jumlah Pembayaran a/ PMK-29 & PMK-91</label>
                             @if(!empty($dtPB->jumlah_byr_pmk))
+                              @php
+                                $jpmk = number_format($dtPB->jumlah_byr_pmk,2,',','.');
+                              @endphp
                               <div class="input-group">
                                 <div class="input-group-prepend">
                                   <span class="input-group-text"><b>Rp.</b></span>
                                 </div>
-                                <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control uang" value="{{$dtPB->jumlah_byr_pmk}}">
+                                <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control uang" value="{{$jpmk}}">
                               </div>
                               <!-- <input type="text" id="jumlah_bayar" name="jumlah_bayar" class="form-control" value="{{$dtPB->jumlah_byr_pmk}}"> -->
                             @else
@@ -433,20 +438,7 @@
                               </div>
                             </div>
                           </div>
-                        </div> 
-                        <div class="col-6">
-                          <div class="form-group">
-                              <label for="kriteria_permohonan">Kriteria Permohonan</label>
-                              <select class="form-control select2bs4" name="kriteria_permohonan" disabled>
-                                  <option selected disabled>Pilih Kriteria Permohonan</option>
-                                  <@foreach($dtKriteria as $dt)
-                                      <option value="{{$dt->kriteria_permohonan}}" {{ ($dtPB->kriteria_permohonan == $dt->kriteria_permohonan) ? "selected" : " " }}>{{$dt->kriteria_permohonan}}</option>
-                                  @endforeach
-                              </select>
-                          </div>
                         </div>
-                      </div>  
-                      <div class="col-12 row"> 
                         <div class="col-6">
                           <div class="card-footer hideread">
                             @if($mode=='edit')
@@ -511,8 +503,8 @@
     // Format mata uang.
     // $('.uang').maskMoney();
     $('.uang').inputmask("decimal", {
-      radixPoint: ".",
-      groupSeparator: ",",
+      radixPoint: ",",
+      groupSeparator: ".",
       autoGroup: true,
       prefix: '', //Space after $, this will not truncate the first character.
       rightAlign: false,
@@ -548,15 +540,15 @@
       minViewMode: 2,
       format: 'yyyy'
     });
-    $('#jumlah_bayar').inputmask("decimal", {
-      radixPoint: ".",
-      groupSeparator: ".",
-      // digits: 2,
-      autoGroup: true,
-      prefix: '', //Space after $, this will not truncate the first character.
-      rightAlign: false,
-      autoUnmask: true
-    });
+    // $('#jumlah_bayar').inputmask("decimal", {
+    //   radixPoint: ".",
+    //   groupSeparator: ".",
+    //   // digits: 2,
+    //   autoGroup: true,
+    //   prefix: '', //Space after $, this will not truncate the first character.
+    //   rightAlign: false,
+    //   autoUnmask: true
+    // });
     // if ($('input:checkbox').filter(':checked').length < 1){
     //     alert("Pilih seksi konseptor!");
     //   return false;

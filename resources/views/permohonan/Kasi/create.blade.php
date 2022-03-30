@@ -625,6 +625,14 @@
                                     <a href="{{route("kasi.print", base64_encode($dataPB->no_agenda))}}"  id="print" class="btn btn-info">
                                         <i class="fas fa-download"></i> Unduh Excel
                                     </a>
+                                    <button aria-expanded="false" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" type="button" id="printLabel">
+                                        <i class="fas fa-download"></i> Unduh Label 
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul role="menu" class="dropdown-menu">
+                                        <li><a href="{{route("kasi.printLabel", [base64_encode($dataPB->no_agenda), 'doc'])}}">&nbsp &nbsp .doc</a></li>
+                                        <li><a href="{{route("kasi.printLabel", [base64_encode($dataPB->no_agenda), 'docx'])}}">&nbsp &nbsp .docx</a></li>
+                                    </ul>
                                 @else
                                     <button type="submit" name="mode" class="btn btn-success float-left" value="add">Add</button>
                                     &nbsp &nbsp<button type="reset" class="btn btn-default">Reset</button>
@@ -670,6 +678,7 @@
         }else if(cekuser == 'Forecaster'){
             $('.form-control, .btn, .form-check-input, .custom-file-input').prop('disabled',true);
             $('#print').css('pointer-events','none');
+            $('#printLabel').css('pointer-events','none');
         }
         bsCustomFileInput.init();
         // Format mata uang.

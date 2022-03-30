@@ -90,7 +90,7 @@
                                     <select class="form-control select2bs4" id="pk_konseptor" name="pk_konseptor">
                                         <option selected disabled value='-'>Pilih PK Konseptor</option>
                                         @foreach($dtKepsek as $dt)
-                                            <option value="{{$dt->nama_anggota}}">{{$dt->nama_anggota}}</option>
+                                            <option value="{{$dt->nama_penelaah}}">{{$dt->nama_penelaah}}</option>
                                         @endforeach
                                     </select>
                                   </div>

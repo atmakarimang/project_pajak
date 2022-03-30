@@ -295,40 +295,70 @@ class BandingGugatanController extends Controller
         $sheet->getColumnDimension('B')->setWidth(21);
         $sheet->getColumnDimension('C')->setWidth(21);
         $sheet->getColumnDimension('D')->setWidth(21);
-        $sheet->getColumnDimension('E')->setWidth(35);
-        $sheet->getColumnDimension('F')->setWidth(35);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(15);
+        $sheet->getColumnDimension('G')->setWidth(15);
+        $sheet->getColumnDimension('H')->setWidth(35);
+        $sheet->getColumnDimension('I')->setWidth(35);
+        $sheet->getColumnDimension('J')->setWidth(15);
 
         $sheet->setCellValue('A1', 'Majelis');
         $sheet->setCellValue('B1', 'No Sengketa');
         $sheet->setCellValue('C1', 'Nama Wajib Pajak');
         $sheet->setCellValue('D1', 'Objek Banding Gugatan');
-        $sheet->setCellValue('E1', 'Petugas Sidang');
-        $sheet->setCellValue('F1', 'Pelaksana Eksekutor');
-        $sheet->setCellValue('B2', 'Sidang ke');
-        $sheet->setCellValue('C2', 'Tanggal');
-        $sheet->setCellValue('D2', 'Status');
+        $sheet->setCellValue('E1', 'Sidang ke');
+        $sheet->setCellValue('F1', 'Tanggal');
+        $sheet->setCellValue('G1', 'Status');
+        $sheet->setCellValue('H1', 'Petugas Sidang');
+        $sheet->setCellValue('I1', 'Pelaksana Eksekutor');
+        $sheet->setCellValue('J1', 'Tanggal Sidang Terakhir/Tanggal Cukup');
 
-
-        $last_row = $sheet->getHighestRow();
+        $spreadsheet->getActiveSheet()->getStyle('A1:J1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:J1')->applyFromArray($fontTitle);
+        $spreadsheet->getActiveSheet()->mergeCells('A1:A2');
+        $spreadsheet->getActiveSheet()->mergeCells('B1:B2');
+        $spreadsheet->getActiveSheet()->mergeCells('C1:C2');
+        $spreadsheet->getActiveSheet()->mergeCells('D1:D2');
+        $spreadsheet->getActiveSheet()->mergeCells('E1:E2');
+        $spreadsheet->getActiveSheet()->mergeCells('F1:F2');
+        $spreadsheet->getActiveSheet()->mergeCells('G1:G2');
+        $spreadsheet->getActiveSheet()->mergeCells('H1:H2');
+        $spreadsheet->getActiveSheet()->mergeCells('I1:I2');
+        $spreadsheet->getActiveSheet()->mergeCells('J1:J2');
+        // $last_row = $sheet->getHighestRow();
+        $last_row = 2;
         foreach ($data as $key => $dt) {
             $last_row++;
             $sheet->setCellValue('A' . $last_row, $dt->majelis);
             $sheet->setCellValue('B' . $last_row, $dt->no_sengketa);
             $sheet->setCellValue('C' . $last_row, $dt->nama_wajib_pajak);
             $sheet->setCellValue('D' . $last_row, $dt->objek_bg);
-            $sheet->setCellValue('E' . $last_row, $dt->petugas_sidang);
-            $sheet->setCellValue('F' . $last_row, $dt->pelaksana_eksekutor);
-            $sheet->getStyle('A' . $last_row . ':F' . $last_row)->applyFromArray($fontTitle);
+            $sheet->setCellValue('H' . $last_row, $dt->petugas_sidang);
+            $sheet->setCellValue('I' . $last_row, $dt->pelaksana_eksekutor);
+            // $sheet->setCellValue('J' . $last_row, $tgl_sidang_ckp);
 
             $last_rowOF = $last_row;
             $bgChild = BandingGugatanChild::where('id_bg', $dt->id_bg)->get();
             $countChild = count($bgChild);
             for ($x = 0; $x < $countChild; $x++) {
+                $get_status = BandingGugatanChild::where('id_bg', $bgChild[$x]->id_bg)
+                    ->where('status_sidang', 'Cukup')
+                    ->max('sidang_ke');
+                if ($get_status != null) {
+                    $status = BandingGugatanChild::where('id_bg', $bgChild[$x]->id_bg)->where('sidang_ke', $get_status)->first();
+                    $tgl_sidang_ckp = $status['tanggal_sidang'];
+                } else {
+                    $tgl_sidang_ckp = '';
+                }
                 $last_rowOF++;
                 $last_row++;
-                $sheet->setCellValue('B' . $last_rowOF, $bgChild[$x]->sidang_ke);
-                $sheet->setCellValue('C' . $last_rowOF, $bgChild[$x]->tanggal_sidang);
-                $sheet->setCellValue('D' . $last_rowOF, $bgChild[$x]->status_sidang);
+                $rownya = $last_row - 1;
+                $sheet->setCellValue('E' . $rownya, $bgChild[$x]->sidang_ke);
+                $sheet->setCellValue('F' . $rownya, $bgChild[$x]->tanggal_sidang);
+                $sheet->setCellValue('G' . $rownya, $bgChild[$x]->status_sidang);
+                if ($bgChild[$x]->status_sidang == 'Cukup') {
+                    $sheet->setCellValue('J' . $rownya, $tgl_sidang_ckp);
+                }
             }
         }
 
@@ -344,12 +374,15 @@ class BandingGugatanController extends Controller
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => [
-                    'argb' => 'FF000080',
+                    'argb' => '006b11',
                 ],
-            ]
+            ],
+            'alignment' => [
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
         ];
-        $sheet->getStyle('A1:F1')->applyFromArray($fontTitle);
-        $sheet->getStyle('B2:D2')->applyFromArray($fontTitle);
+        $sheet->getStyle('A1:J1')->applyFromArray($header_style_border);
 
         header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename=Banding Gugatan.xls');

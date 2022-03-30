@@ -53,6 +53,11 @@ Route::get('/master-data/deleteJP/{id}', 'App\Http\Controllers\MasterData\DataPe
 Route::get('/master-data/ajaxDataKP', 'App\Http\Controllers\MasterData\DataPermohonanController@ajaxDataKP')->name('permohonan.ajaxDataKP')->middleware('checkLogin');
 Route::get('/master-data/editKP/', 'App\Http\Controllers\MasterData\DataPermohonanController@editKP')->name('permohonan.editKP')->middleware('checkLogin');
 Route::get('/master-data/deleteKP/{id}', 'App\Http\Controllers\MasterData\DataPermohonanController@deleteKP')->middleware('checkLogin');
+Route::get('/master-data/kriteriaPermohonan', 'App\Http\Controllers\MasterData\KriteriaPermohonanController@index')->name('kr_permohonan.index')->middleware('checkLogin');
+Route::post('/master-data/storeKriteria', 'App\Http\Controllers\MasterData\KriteriaPermohonanController@storeKriteria')->name('kr_permohonan.storeKriteria')->middleware('checkLogin');
+Route::get('/master-data/ajaxDataKriteria', 'App\Http\Controllers\MasterData\KriteriaPermohonanController@ajaxDataKriteria')->name('kr_permohonan.ajaxDataKriteria')->middleware('checkLogin');
+Route::get('/master-data/editKriteria/', 'App\Http\Controllers\MasterData\KriteriaPermohonanController@editKriteria')->name('kr_permohonan.editKriteria')->middleware('checkLogin');
+Route::get('/master-data/deleteKriteria/{id}', 'App\Http\Controllers\MasterData\KriteriaPermohonanController@deleteKriteria')->middleware('checkLogin');
 
 Route::get('/master-data/seksi', 'App\Http\Controllers\MasterData\DataSeksiController@index')->name('seksi.index')->middleware('checkLogin');
 Route::post('/master-data/storeKepSeksi', 'App\Http\Controllers\MasterData\DataSeksiController@storeKepSeksi')->name('seksi.storeKepSeksi')->middleware('checkLogin');
@@ -123,6 +128,7 @@ Route::get('/permohonan/kasi', 'App\Http\Controllers\Permohonan\KasiController@i
 Route::get('/permohonan/kasi/datatableKasi', 'App\Http\Controllers\Permohonan\KasiController@datatableKasi')->name('kasi.datatableKasi')->middleware('checkLogin');
 Route::get('/permohonan/kasi/create/{no_agenda}', 'App\Http\Controllers\Permohonan\KasiController@create')->name('kasi.create')->middleware('checkLogin');
 Route::post('/permohonan/kasi/store', 'App\Http\Controllers\Permohonan\KasiController@store')->name('kasi.store')->middleware('checkLogin');
+Route::get('/permohonan/kasi/printLabel/{id}/{doctype}', 'App\Http\Controllers\Permohonan\KasiController@printLabel')->name('kasi.printLabel')->middleware('checkLogin');
 Route::get('/permohonan/kasi/print/{id}', 'App\Http\Controllers\Permohonan\KasiController@print')->name('kasi.print')->middleware('checkLogin');
 Route::get('/permohonan/kasi/printAll', 'App\Http\Controllers\Permohonan\KasiController@printAll')->name('kasi.printAll')->middleware('checkLogin');
 

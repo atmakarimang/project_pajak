@@ -33,6 +33,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
+<!-- Chart JS -->
+<script src="{{asset('assets/AdminLTE/plugins/chart.js/Chart.js')}}"></script>
+<script src="{{asset('assets/AdminLTE/plugins/jquery/jquery.js')}}"></script>
+
 <style>
 .brand-link {
     position: relative;

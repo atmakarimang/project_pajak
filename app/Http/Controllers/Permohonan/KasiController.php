@@ -29,6 +29,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpWord\Style\Table;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class KasiController extends Controller
@@ -76,8 +79,9 @@ class KasiController extends Controller
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
             OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
-            OR pajak like lower('%{$search}%') OR no_ketetapan like lower('%{$search}%')
-            OR seksi_konseptor like lower('%{$search}%') OR progress like lower('%{$search}%') OR status like lower('%{$search}%') OR hasil_keputusan like lower('%{$search}%')";
+            OR no_ketetapan like lower('%{$search}%') OR no_produk_hukum like lower('%{$search}%') 
+            OR tgl_produk_hukum like lower('%{$search}%') OR pk_konseptor like lower('%{$search}%')
+            OR hasil_keputusan like lower('%{$search}%') OR status like lower('%{$search}%')";
             $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
             if ($orderBy != null) {
                 $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
@@ -159,10 +163,10 @@ class KasiController extends Controller
                 $dt->npwp,
                 $dt->nama_wajib_pajak,
                 $dt->jenis_permohonan,
-                $dt->pajak,
                 $dt->no_ketetapan,
-                $dt->seksi_konseptor,
-                $progress,
+                $dt->pk_konseptor,
+                $dt->no_produk_hukum,
+                $dt->tgl_produk_hukum,
                 $status,
                 $hasil_kep,
                 $action,
@@ -290,6 +294,152 @@ class KasiController extends Controller
         $data["flashs"] = $flashs;
         return redirect()->route('kasi.index');
     }
+    public function printLabel($no_agenda, $docExt)
+    {
+        $noagen = base64_decode($no_agenda);
+        $data = PelaksanaBidang::where('no_agenda', '=', $noagen)->first();
+        if (!$data) {
+            // $msg = notifErrorHelper('Wrong Action','Error');
+            // return redirect()->back()->with('flashs',$msg);
+            return redirect()->back();
+        }
+        $keberatan = stripos($data->jenis_permohonan, 'keberatan');
+        //MR != keberatan 3bln, = keberatan 8bln
+        $tgl_diterima_kpp = date('d-m-Y', strtotime($data->tgl_diterima_kpp));
+        $d_mr = strtotime("+3 months", strtotime($data->tgl_diterima_kpp));
+        $d_mrk = strtotime("+8 months", strtotime($data->tgl_diterima_kpp));
+        //IKU != keberatan 5bln, = keberatan 10bln
+        $d_iku = strtotime("+5 months", strtotime($data->tgl_diterima_kpp));
+        $d_ikuk = strtotime("+10 months", strtotime($data->tgl_diterima_kpp));
+        //KUP != keberatan 6bln, = keberatan 12bln
+        $d_kup = strtotime("+6 months", strtotime($data->tgl_diterima_kpp));
+        $d_kupk = strtotime("+12 months", strtotime($data->tgl_diterima_kpp));
+        if ($keberatan != "") { // == keberatan
+            $jt_mr = date("d-m-Y", $d_mrk);
+            $jt_iku = date("d-m-Y", $d_ikuk);
+            $jt_kup = date("d-m-Y", $d_kupk);
+        } else { // !=keberatan
+            $jt_mr = date("d-m-Y", $d_mr);
+            $jt_iku = date("d-m-Y", $d_iku);
+            $jt_kup = date("d-m-Y", $d_kup);
+        }
+        $phpWord = new PhpWord();
+        $section = $phpWord->addSection();
+        $header = $section->addHeader();
+        $table_style = new Table;
+        $table_style->setUnit(\PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT);
+        $table_style->setWidth(100 * 50);
+        $section->addText("LABEL PENGAWASAN DOKUMEN", ['size' => 12, 'bold' => true], array('align' => 'center'));
+        $section->addText("BIDANG KEBERATAN, BANDING, DAN PENGURANGAN", ['size' => 12, 'bold' => true], array('align' => 'center'));
+        $section->addText("KANWIL DJP JAWA TIMUR I", ['size' => 12, 'bold' => true], array('align' => 'center'));
+
+        $table_style_detail = array(
+            'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT,
+            'width' => 100 * 50,
+            'borderSize' => 0,
+            'borderColor' => '757575',
+            'cellMargin' => 80,
+            'orientation' => 'landscape'
+        );
+        $titleStyle = array(
+            'align' => 'center',
+            'marginTop' => 10,
+            'bgColor' => '893103',
+        );
+        $table = $section->addTable($table_style_detail);
+        $fontStyle = array('bold' => true, 'bgColor' => 'FF000080');
+        $fontStyle1 = array('bold' => true, 'bgColor' => '893103');
+        $cellRowSpan = array('vMerge' => 'restart');
+        $cellRowContinue = array('vMerge' => 'continue');
+        $cellColSpan = array('gridSpan' => 3, 'bgColor' => '893103');
+        $tableCenterValignText = array('bold' => true, 'color' => 'ffffff');
+        $tableCenterValignText1 = array('bold' => false, 'color' => 'black');
+
+        $table->addRow();
+        $table->addCell(9000, $cellColSpan)->addText("JATUH TEMPO", $tableCenterValignText, array('align' => 'center'));
+        $table->addRow();
+        $table->addCell(3000, $fontStyle1)->addText("MR", $tableCenterValignText, array('align' => 'center'));
+        $table->addCell(3000, $fontStyle1)->addText("IKU", $tableCenterValignText, array('align' => 'center'));
+        $table->addCell(3000, $fontStyle1)->addText("KUP", $tableCenterValignText, array('align' => 'center'));
+        $table->addRow();
+        $table->addCell(3000, $fontStyle)->addText($jt_mr, $tableCenterValignText1, array('align' => 'center'));
+        $table->addCell(3000, $fontStyle)->addText($jt_iku, $tableCenterValignText1, array('align' => 'center'));
+        $table->addCell(3000, $fontStyle)->addText($jt_kup, $tableCenterValignText1, array('align' => 'center'));
+        // $table->addRow();
+        $styleCell =
+            [
+                'borderColor' => 'ffffff',
+                'borderSize' => 6,
+            ];
+        $section->addTextRun();
+        $table2 = $section->addTable($table_style_detail);
+        $table2->addRow();
+        $table2->addCell(12000, array('gridSpan' => 3, 'bgColor' => '00284f'))->addText("IDENTITAS DOKUMEN", array('bold' => true, 'align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('No Agenda', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->no_agenda, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('No Pokok Wajib Pajak', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->npwp, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Jenis Permohonan', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->jenis_permohonan, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Kriteria Permohonan', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->kriteria_permohonan, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Jenis Ketetapan', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->jenis_ketetapan, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('No Ketetapan', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->no_ketetapan, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Jenis Pajak', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->pajak, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Masa Pajak', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->masa_pajak, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Tahun Pajak', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->tahun_pajak, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Tanggal diterima KPP', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($tgl_diterima_kpp, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Tanggal diterima Kanwil', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $tglkanwil = date('d-m-Y', strtotime($data->tgl_diterima_kanwil));
+        $table2->addCell(3900, $styleCell)->addText($tglkanwil, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Seksi Konseptor', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->seksi_konseptor, array('align' => 'center'));
+        $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('PK Konseptor', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->pk_konseptor, array('align' => 'center'));
+
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+
+        header("Content-Description: File Transfer");
+        header('Content-Disposition: attachment; filename="Label ' . $noagen . '.' . $docExt);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Expires: 0');
+
+        $objWriter->save("php://output");
+    }
     public function print($no_agenda)
     {
         $noagen = base64_decode($no_agenda);
@@ -372,20 +522,21 @@ class KasiController extends Controller
         $sheet->setCellValue('X1', 'Nomor Produk Hukum');
         $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
         $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
-        $sheet->setCellValue('AA1', 'Tambah/Kurang');
-        $sheet->setCellValue('AB1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
-        $sheet->setCellValue('AC1', 'Hasil Keputusan');
-        $sheet->setCellValue('AD1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AE1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AF1', 'Nomor Surat Pengantar');
-        $sheet->setCellValue('AG1', 'Tanggal Surat Pengantar');
-        $sheet->setCellValue('AH1', 'Status');
-        $sheet->setCellValue('AI1', 'Progress');
-        $sheet->setCellValue('AJ1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('AK1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('AA1', 'Tambah');
+        $sheet->setCellValue('AB1', 'Kurang');
+        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AD1', 'Hasil Keputusan');
+        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
+        $sheet->setCellValue('AI1', 'Status');
+        $sheet->setCellValue('AJ1', 'Progress');
+        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
 
-        $spreadsheet->getActiveSheet()->getStyle('A1:AK1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        $sheet->getStyle('A1:AK1')->applyFromArray($fontTitle);
+        $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
         $sheet->getRowDimension('4')->setRowHeight(20);
 
         $sheet->setCellValue('A2', $data->no_agenda);
@@ -414,17 +565,18 @@ class KasiController extends Controller
         $sheet->setCellValue('X2', $data->no_produk_hukum);
         $sheet->setCellValue('Y2', date("d-m-Y", strtotime($data->tgl_produk_hukum)));
         $sheet->setCellValue('Z2', $data->jml_byr_semula);
-        $sheet->setCellValue('AA2', $data->tambah_kurang);
-        $sheet->setCellValue('AB2', $data->jml_byr_produk);
-        $sheet->setCellValue('AC2', $data->hasil_keputusan);
-        $sheet->setCellValue('AD2', $data->no_resi);
-        $sheet->setCellValue('AE2', date("d-m-Y", strtotime($data->tgl_resi)));
-        $sheet->setCellValue('AF2', $data->no_srt_pengantar);
-        $sheet->setCellValue('AG2', date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
-        $sheet->setCellValue('AH2', $data->status);
-        $sheet->setCellValue('AI2', $data->progress);
-        $sheet->setCellValue('AJ2', $data->jumlah_byr_pmk);
-        $sheet->setCellValue('AK2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+        $sheet->setCellValue('AA2', $data->tambah);
+        $sheet->setCellValue('AB2', $data->kurang);
+        $sheet->setCellValue('AC2', $data->jml_byr_produk);
+        $sheet->setCellValue('AD2', $data->hasil_keputusan);
+        $sheet->setCellValue('AE2', $data->no_resi);
+        $sheet->setCellValue('AF2', date("d-m-Y", strtotime($data->tgl_resi)));
+        $sheet->setCellValue('AG2', $data->no_srt_pengantar);
+        $sheet->setCellValue('AH2', date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
+        $sheet->setCellValue('AI2', $data->status);
+        $sheet->setCellValue('AJ2', $data->progress);
+        $sheet->setCellValue('AK2', $data->jumlah_byr_pmk);
+        $sheet->setCellValue('AL2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
 
         $header_style_border = [
             'borders' => [
@@ -442,7 +594,7 @@ class KasiController extends Controller
                 ],
             ]
         ];
-        $sheet->getStyle('A1:AK1')->applyFromArray($header_style_border);
+        $sheet->getStyle('A1:AL1')->applyFromArray($header_style_border);
         header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename="Eksekutor ' . $noagen . '.xls');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');

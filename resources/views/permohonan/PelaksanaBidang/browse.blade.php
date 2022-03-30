@@ -62,19 +62,20 @@
                           <br><br>
                             <table class="table table-bordered table-hover" id="tabel-pb">
                                 <thead style="text-align:center">                
-                                    <tr>
+                                  <tr>
                                     <th style="width: 10px">No</th>
                                     <th>No Agenda</th>
                                     <th>NPWP</th>
                                     <th>Nama Wajib Pajak</th>
                                     <th>Jenis Permohonan</th>
-                                    <th>Jenis Pajak</th>
                                     <th>No Ketetapan</th>
-                                    <th>Seksi Konseptor</th>
-                                    <th>Progress</th>
+                                    <th>PK Konseptor</th>
+                                    <th>No Produk Hukum</th>
+                                    <th>Tanggal Produk Hukum</th>
                                     <th>Status</th>
+                                    <th>Keputusan</th>
                                     <th style="width: 5%"></th>
-                                    </tr>
+                                  </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
@@ -112,12 +113,13 @@
       {"targets": 2, "name": 'npwp'},
       {"targets": 3, "name": 'nama_wajib_pajak'},
       {"targets": 4, "name": 'jenis_permohonan'},
-      {"targets": 5, "name": 'pajak'},
-      {"targets": 6, "name": 'no_ketetapan'},
-      {"targets": 7, "name": 'seksi_konseptor'},
-      {"targets": 8, "name": 'progress'},
+      {"targets": 5, "name": 'no_ketetapan'},
+      {"targets": 6, "name": 'pk_konseptor'},
+      {"targets": 7, "name": 'no_produk_hukum'},
+      {"targets": 8, "name": 'tgl_produk_hukum'},
       {"targets": 9, "name": 'status'},
-      {"targets": 10, "orderable": false},
+      {"targets": 10, "name": 'hasil_keputusan'},
+      {"targets": 11, "orderable": false},
     ],
     order: [[ 0, "DESC" ]],
   });
