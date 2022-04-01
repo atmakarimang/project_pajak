@@ -623,7 +623,11 @@
                             <div class="card-footer">
                                 @if($dataPB->no_produk_hukum)
                                     <button type="submit" name="mode" class="btn btn-success float-left" value="edit">Update</button>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                @else
+                                    <button type="submit" name="mode" class="btn btn-success float-left" value="add">Add</button>
+                                    &nbsp &nbsp<button type="reset" class="btn btn-default">Reset</button>
+                                @endif
+                                &nbsp;&nbsp;&nbsp;&nbsp;
                                     <a href="{{route("kasi.print", base64_encode($dataPB->no_agenda))}}"  id="print" class="btn btn-info">
                                         <i class="fas fa-download"></i> Unduh Excel
                                     </a>
@@ -635,10 +639,6 @@
                                         <li><a href="{{route("kasi.printLabel", [base64_encode($dataPB->no_agenda), 'doc'])}}">&nbsp &nbsp .doc</a></li>
                                         <li><a href="{{route("kasi.printLabel", [base64_encode($dataPB->no_agenda), 'docx'])}}">&nbsp &nbsp .docx</a></li>
                                     </ul>
-                                @else
-                                    <button type="submit" name="mode" class="btn btn-success float-left" value="add">Add</button>
-                                    &nbsp &nbsp<button type="reset" class="btn btn-default">Reset</button>
-                                @endif
                             </div>
                     </div>
                     </form>
