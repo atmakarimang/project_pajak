@@ -136,7 +136,7 @@
                                     <div class="form-group col-md-4">
                                         <label for="no_bidang">Nomor Objek Banding/Gugatan</label>
                                         @if(!empty($dtBG->no_bidang))
-                                            <input type="text" id="no_bidang" name="no_bidang" class="form-control" value="{{$dtBG->objek_bg}}">
+                                            <input type="text" id="no_bidang" name="no_bidang" class="form-control" value="{{$dtBG->no_bidang}}">
                                         @else
                                             <input type="text" id="no_bidang" name="no_bidang" class="form-control">
                                         @endif
