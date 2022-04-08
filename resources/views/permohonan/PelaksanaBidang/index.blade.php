@@ -86,9 +86,9 @@
                                 @php
                                   $tgl = date('d-m-Y', strtotime($dtPB->tgl_agenda));
                                 @endphp
-                                <input type="text" class="form-control" name="tgl_agenda" value="{{$tgl}}" required readonly/>
+                                <input type="text" class="form-control" name="tgl_agenda" value="{{$tgl}}" readonly/>
                               @else
-                                <input type="text" name="tgl_agenda" class="form-control datetimepicker-input datenya" name="tgl_agenda[]" required/>
+                                <input type="text" name="tgl_agenda" class="form-control datetimepicker-input datenya" name="tgl_agenda[]"/>
                               @endif
                               <div class="input-group-append" data-toggle="datetimepicker">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -130,7 +130,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="asal_permohonan">Asal Permohonan</label>
-                            <select class="form-control select2bs4" name="asal_permohonan" required>
+                            <select class="form-control select2bs4" name="asal_permohonan">
                                 <option selected disabled>Pilih Asal Permohonan</option>
                                 @foreach($dtAsalPermohonan as $dt)
                                   <option value="{{$dt->pemohon}}" {{ ($dt->pemohon==$dtPB->pemohon) ? "selected" : "" }}>{{$dt->id}} {{$dt->pemohon}}</option>
@@ -213,7 +213,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_permohonan">Jenis Permohonan</label>
-                            <select class="form-control select2bs4" name="jenis_permohonan" required>
+                            <select class="form-control select2bs4" name="jenis_permohonan">
                                 <option selected disabled>Pilih Jenis Permohonan</option>
                                 @foreach($dtJnsPermohonan as $dt)
                                   <option value="{{$dt->jenis_permohonan}}" {{ ($dt->jenis_permohonan==$dtPB->jenis_permohonan) ? "selected" : "" }}>{{$dt->jenis_permohonan}}</option>
@@ -224,7 +224,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_pajak">Jenis Pajak</label>
-                            <select class="form-control select2bs4" name="jenis_pajak" required>
+                            <select class="form-control select2bs4" name="jenis_pajak">
                                 <option selected disabled>Pilih Jenis Pajak</option>
                                 @foreach($dtPajak as $dt)
                                   <option value="{{$dt->pajak}}" {{ ($dt->pajak==$dtPB->pajak) ? "selected" : "" }}>{{$dt->pajak}}</option>
@@ -237,7 +237,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_ketetapan">Jenis Ketetapan</label>
-                            <select class="form-control select2bs4" name="jenis_ketetapan" required>
+                            <select class="form-control select2bs4" name="jenis_ketetapan">
                                 <option selected disabled>Pilih Jenis Ketetapan</option>
                                 @foreach($dtKetetapan as $dt)
                                   <option value="{{$dt->jenis_ketetapan}}" {{ ($dt->jenis_ketetapan==$dtPB->jenis_ketetapan) ? "selected" : "" }}>{{$dt->jenis_ketetapan}}</option>
@@ -278,7 +278,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="jenis_ketetapan">Masa Pajak</label>
-                            <select class="form-control select2bs4" multiple="multiple" name="masa_pajak[]" required>
+                            <select class="form-control select2bs4" multiple="multiple" name="masa_pajak[]">
                               @php
                                 $ex = explode(",",$dtPB->masa_pajak);
                               @endphp
@@ -312,7 +312,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="kat_permohonan">Kategori Permohonan</label>
-                            <select class="form-control" name="kat_permohonan" required>
+                            <select class="form-control" name="kat_permohonan">
                                 <option selected disabled>Pilih Kategori Permohonan</option>
                                 @foreach($dtKatPermohonan as $dt)
                                   <option value="{{$dt->kat_permohonan}}" {{ ($dtPB->kat_permohonan == $dt->kat_permohonan) ? "selected" : "" }}>{{$dt->kat_permohonan}}</option>
@@ -376,7 +376,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="status">Status</label>
-                            <select class="form-control" name="status" required>
+                            <select class="form-control" name="status">
                               @foreach($dtStatus as $dt)
                                 <option value="{{$dt->status}}" {{ ($dtPB->status == $dt->status) ? "selected" : " " }}>{{$dt->status}}</option>
                               @endforeach
@@ -388,7 +388,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label for="progress">Progress</label>
-                            <select class="form-control" name="progress" required>
+                            <select class="form-control" name="progress">
                               @foreach($dtProgress as $dt)
                                 <option value="{{$dt->progress}}" {{ ($dtPB->progress == $dt->progress) ? "selected" : " " }}>{{$dt->progress}}</option>
                               @endforeach
@@ -440,6 +440,19 @@
                           </div>
                         </div>
                         <div class="col-6">
+                          <div class="form-group">
+                            <label for="kriteria_permohonan">Kriteria Permohonan</label>
+                            <select class="form-control select2bs4" name="kriteria_permohonan" disabled>
+                              <option selected disabled>Pilih Kriteria Permohonan</option>
+                              <@foreach($dtKriteria as $dt)
+                              <option value="{{$dt->kriteria_permohonan}}" {{ ($dtPB->kriteria_permohonan == $dt->kriteria_permohonan) ? "selected" : " " }}>{{$dt->kriteria_permohonan}}</option>
+                              @endforeach
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12 row">
+                      <div class="col-6">
                           <div class="card-footer hideread">
                             @if($mode=='edit')
                               <button type="submit" name="mode" class="btn btn-success float-left submit" value="edit">Update</button>

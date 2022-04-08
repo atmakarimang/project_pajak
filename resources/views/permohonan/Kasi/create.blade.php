@@ -389,7 +389,7 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="kepala_seksi">Kepala Seksi</label>
-                                        <select class="form-control select2bs4" multiple="multiple" name="kepala_seksi[]" required>
+                                        <select class="form-control select2bs4" multiple="multiple" name="kepala_seksi[]">
                                             @php
                                                 $ex = explode(",",$dataPB->kepala_seksi);
                                             @endphp
@@ -402,13 +402,11 @@
                                 <div class="col-6">
                                 <div class="form-group">
                                     <label for="pk_konseptor">PK Konseptor</label>
-                                    <select class="form-control select2bs4" multiple="multiple" name="pk_konseptor[]" required>
+                                    <select class="form-control select2bs4" multiple="multiple" name="pk_konseptor[]">
                                         @php
                                             $ex = explode(",",$dataPB->pk_konseptor);
                                         @endphp
-                                        {{-- @foreach($dtKepsek as $dt) --}}
                                         @foreach($dtPenelaah as $dt)
-                                            {{-- <option value="{{$dt->nama_anggota}}" {{ (in_array($dt->nama_anggota, $ex)) ? "selected" : "" }}>{{$dt->nama_anggota}}</option> --}}
                                             <option value="{{$dt->nama_penelaah}}" {{ (in_array($dt->nama_penelaah, $ex)) ? "selected" : "" }}>{{$dt->nama_penelaah}}</option>
                                         @endforeach
                                     </select>
@@ -544,7 +542,7 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="jumlah_tbh">Hasil Keputusan</label>
-                                        <select class="form-control select2bs4" name="hsl_kep" required>
+                                        <select class="form-control select2bs4" name="hsl_kep">
                                             <option selected disabled>Pilih Hasil Keputusan</option>
                                             @foreach($dtKeputusan as $dt)
                                                 <option value="{{$dt->keputusan}}" {{ ($dt->keputusan==$dataPB->hasil_keputusan) ? "selected" : "" }}>{{$dt->keputusan}}</option>

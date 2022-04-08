@@ -15,6 +15,7 @@ use App\Models\Status;
 use App\Models\Progress;
 use App\Models\SeksiKonseptor;
 use App\Models\KategoriPermohonan;
+use App\Models\KriteriaPermohonan;
 use App\Models\User;
 use DB;
 //use Illuminate\Support\Facades\DB;
@@ -48,6 +49,7 @@ class PelaksanaBidangController extends Controller
         $dtProgress = Progress::get();
         $dtSeksiKonsep = SeksiKonseptor::get();
         $dtKatPermohonan = KategoriPermohonan::get();
+        $dtKriteria = KriteriaPermohonan::get();
         $mode = $request->mode;
         $data["mode"] = $mode;
         $no_agenda = base64_decode($request->no);
@@ -84,6 +86,7 @@ class PelaksanaBidangController extends Controller
         $data['dtSeksiKonsep'] = $dtSeksiKonsep;
         $data['dtKatPermohonan'] = $dtKatPermohonan;
         $data['no_agenda'] = $no_agenda;
+        $data['dtKriteria'] = $dtKriteria;
 
         return view($this->PATH_VIEW . 'index', $data);
     }

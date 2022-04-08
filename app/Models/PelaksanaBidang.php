@@ -17,20 +17,20 @@ class PelaksanaBidang extends Model
     {
         $data = new PelaksanaBidang();
         $data->no_agenda = $request->no_agenda;
-        $data->tgl_agenda = date('Y-m-d', strtotime($request->tgl_agenda));
+        $data->tgl_agenda = (!empty($request->tgl_agenda)) ? date('Y-m-d', strtotime($request->tgl_agenda)) : null;
         $data->no_naskah_dinas = (!empty($request->no_naskahdinas)) ? $request->no_naskahdinas : "";
-        $data->tgl_naskah_dinas = date('Y-m-d', strtotime($request->tgl_naskahdinas));
+        $data->tgl_naskah_dinas = (!empty($request->tgl_naskahdinas)) ? date('Y-m-d', strtotime($request->tgl_naskahdinas)) : null;
         $data->pemohon = $request->asal_permohonan;
         $data->no_lbr_pengawas_dok = $request->no_arusdok;
-        $data->tgl_diterima_kpp = date('Y-m-d', strtotime($request->tgl_in_kpp));
-        $data->tgl_diterima_kanwil = date('Y-m-d', strtotime($request->tgl_in_kanwil));
+        $data->tgl_diterima_kpp = (!empty($request->tgl_in_kpp)) ? date('Y-m-d', strtotime($request->tgl_in_kpp)) : null;
+        $data->tgl_diterima_kanwil = (!empty($request->tgl_in_kanwil)) ? date('Y-m-d', strtotime($request->tgl_in_kanwil)) : null;
         $data->npwp = $request->no_npwp;
         $data->nama_wajib_pajak = $request->nama_npwp;
         $data->jenis_permohonan = $request->jenis_permohonan;
         $data->pajak = $request->jenis_pajak;
         $data->jenis_ketetapan = $request->jenis_ketetapan;
         $data->no_ketetapan = $request->no_ketetapan;
-        $data->tgl_ketetapan = date('Y-m-d', strtotime($request->tgl_ketetapan));
+        $data->tgl_ketetapan = (!empty($request->tgl_ketetapan)) ? date('Y-m-d', strtotime($request->tgl_ketetapan)) : null;
         if (!empty($request->masa_pajak)) {
             $masa_pjk = implode(",", $request->masa_pajak);
             $data->masa_pajak = $masa_pjk;
@@ -38,7 +38,7 @@ class PelaksanaBidang extends Model
         $data->tahun_pajak = $request->tahun_pajak;
         $data->kat_permohonan = $request->kat_permohonan;
         $data->no_srt_permohonan = $request->no_srt_per;
-        $data->tgl_srt_permohonan = date('Y-m-d', strtotime($request->tgl_srtper));
+        $data->tgl_srt_permohonan = (!empty($request->tgl_srtper)) ? date('Y-m-d', strtotime($request->tgl_srtper)) : null;
         if (!empty($request->seksi_konseptor)) {
             $seksiKonseptor = implode(",", $request->seksi_konseptor);
             $data->seksi_konseptor = $seksiKonseptor;
@@ -49,6 +49,7 @@ class PelaksanaBidang extends Model
         $jbp  = floatval(str_replace(',', '.', str_replace('.', '', $request->jumlah_bayar)));
         $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? $jbp : 0;
         $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
+        $data->kriteria_permohonan = $request->kriteria_permohonan;
         $data->no = substr($request->no_agenda, 2, 7);
         $data->tahun = date('Y');
         $data->save();
@@ -58,18 +59,19 @@ class PelaksanaBidang extends Model
     public static function updateDt($request, $data)
     {
         $data->no_naskah_dinas = $request->no_naskahdinas;
-        $data->tgl_naskah_dinas = date('Y-m-d', strtotime($request->tgl_naskahdinas));
+        $data->tgl_agenda = (!empty($request->tgl_agenda)) ? date('Y-m-d', strtotime($request->tgl_agenda)) : null;
+        $data->tgl_naskah_dinas = (!empty($request->tgl_naskahdinas)) ? date('Y-m-d', strtotime($request->tgl_naskahdinas)) : null;
         $data->pemohon = $request->asal_permohonan;
         $data->no_lbr_pengawas_dok = $request->no_arusdok;
-        $data->tgl_diterima_kpp = date('Y-m-d', strtotime($request->tgl_in_kpp));
-        $data->tgl_diterima_kanwil = date('Y-m-d', strtotime($request->tgl_in_kanwil));
+        $data->tgl_diterima_kpp = (!empty($request->tgl_in_kpp)) ? date('Y-m-d', strtotime($request->tgl_in_kpp)) : null;
+        $data->tgl_diterima_kanwil = (!empty($request->tgl_in_kanwil)) ? date('Y-m-d', strtotime($request->tgl_in_kanwil)) : null;
         $data->npwp = $request->no_npwp;
         $data->nama_wajib_pajak = $request->nama_npwp;
         $data->jenis_permohonan = $request->jenis_permohonan;
         $data->pajak = $request->jenis_pajak;
         $data->jenis_ketetapan = $request->jenis_ketetapan;
         $data->no_ketetapan = $request->no_ketetapan;
-        $data->tgl_ketetapan = date('Y-m-d', strtotime($request->tgl_ketetapan));
+        $data->tgl_ketetapan = (!empty($request->tgl_ketetapan)) ? date('Y-m-d', strtotime($request->tgl_ketetapan)) : null;
         if (!empty($request->masa_pajak)) {
             $masa_pjk = implode(",", $request->masa_pajak);
             $data->masa_pajak = $masa_pjk;
@@ -77,7 +79,7 @@ class PelaksanaBidang extends Model
         $data->tahun_pajak = $request->tahun_pajak;
         $data->kat_permohonan = $request->kat_permohonan;
         $data->no_srt_permohonan = $request->no_srt_per;
-        $data->tgl_srt_permohonan = date('Y-m-d', strtotime($request->tgl_srtper));
+        $data->tgl_srt_permohonan = (!empty($request->tgl_srtper)) ? date('Y-m-d', strtotime($request->tgl_srtper)) : null;
         if (!empty($request->seksi_konseptor)) {
             $seksiKonseptor = implode(",", $request->seksi_konseptor);
             $data->seksi_konseptor = $seksiKonseptor;
@@ -88,7 +90,7 @@ class PelaksanaBidang extends Model
         $jbp  = floatval(str_replace(',', '.', str_replace('.', '', $request->jumlah_bayar)));
         $data->jumlah_byr_pmk = (!empty($request->jumlah_bayar)) ? $jbp : 0;
         $data->tgl_byr_pmk = (!empty($request->tgl_bayar)) ? date('Y-m-d', strtotime($request->tgl_bayar)) : null;
-        // dd($data);
+        $data->kriteria_permohonan = $request->kriteria_permohonan;
         $data->save();
         return $data;
     }
@@ -112,7 +114,7 @@ class PelaksanaBidang extends Model
         }
         // dd($request->jumlah_bayar_awl);
         $data->no_produk_hukum = $request->no_prodhukum;
-        $data->tgl_produk_hukum = date('Y-m-d', strtotime($request->tgl_prodhukum));
+        $data->tgl_produk_hukum = (!empty($request->tgl_prodhukum)) ? date('Y-m-d', strtotime($request->tgl_prodhukum)) : null;
         // $jba = preg_replace('/[^\d\.]/', '',$request->jumlah_bayar_awl);
         // $tk = preg_replace('/[^\d\.]/', '',$request->jumlah_tbh);
         // $jbp = preg_replace('/[^\d\.]/', '',$request->jumlah_bayarprod);
@@ -135,10 +137,10 @@ class PelaksanaBidang extends Model
             $request->noresi->move('public/buktiResi/', $filename);
             $data->no_resi = $filename;
         }
-        $data->tgl_resi = date('Y-m-d', strtotime($request->tgl_resi));
+        $data->tgl_resi = (!empty($request->tgl_resi)) ? date('Y-m-d', strtotime($request->tgl_resi)) : null;
         $data->no_srt_pengantar = $request->no_srtpengantar;
-        $data->tgl_srt_pengantar = date('Y-m-d', strtotime($request->tgl_srtpengantar));
-        // dd($data);
+        $data->tgl_srt_pengantar = (!empty($request->tgl_srtpengantar)) ? date('Y-m-d', strtotime($request->tgl_srtpengantar)) : null;
+        $data->kriteria_permohonan = $request->kriteria_permohonan;
         $data->save();
         return $data;
     }
