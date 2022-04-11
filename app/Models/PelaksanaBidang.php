@@ -101,18 +101,24 @@ class PelaksanaBidang extends Model
             $seksiKonseptor = implode(",", $request->seksi_konseptor);
             $data->seksi_konseptor = $seksiKonseptor;
         }
+
         $data->status = $request->status;
         $data->progress = $request->progress;
-        // dd($data);
+
         if (!empty($request->kepala_seksi)) {
             $kep_sek = implode(",", $request->kepala_seksi);
             $data->kepala_seksi = $kep_sek;
+        } else {
+            $data->kepala_seksi = '';
         }
+
         if (!empty($request->pk_konseptor)) {
             $pk_konseptor = implode(",", $request->pk_konseptor);
             $data->pk_konseptor = $pk_konseptor;
+        } else {
+            $data->pk_konseptor = '';
         }
-        // dd($request->jumlah_bayar_awl);
+
         $data->no_produk_hukum = $request->no_prodhukum;
         $data->tgl_produk_hukum = (!empty($request->tgl_prodhukum)) ? date('Y-m-d', strtotime($request->tgl_prodhukum)) : null;
         // $jba = preg_replace('/[^\d\.]/', '',$request->jumlah_bayar_awl);

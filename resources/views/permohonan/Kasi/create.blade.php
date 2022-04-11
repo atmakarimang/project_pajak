@@ -389,7 +389,7 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="kepala_seksi">Kepala Seksi</label>
-                                        <select class="form-control select2bs4" multiple="multiple" name="kepala_seksi[]">
+                                        <select class="form-control select2bs4" multiple="multiple" name="kepala_seksi[]" disabled>
                                             @php
                                                 $ex = explode(",",$dataPB->kepala_seksi);
                                             @endphp
@@ -404,7 +404,7 @@
                                     <label for="pk_konseptor">PK Konseptor</label>
                                     <select class="form-control select2bs4" multiple="multiple" name="pk_konseptor[]">
                                         @php
-                                            $ex = explode(",",$dataPB->pk_konseptor);
+                                            ($dataPB->pk_konseptor == "") ? $ex = [] : $ex = explode(",",$dataPB->pk_konseptor);
                                         @endphp
                                         @foreach($dtPenelaah as $dt)
                                             <option value="{{$dt->nama_penelaah}}" {{ (in_array($dt->nama_penelaah, $ex)) ? "selected" : "" }}>{{$dt->nama_penelaah}}</option>
@@ -713,8 +713,24 @@
 
         //Initialize Select2 Elements
         $('.select2bs4').select2({
-        theme: 'bootstrap4'
+            theme: 'bootstrap4'
         });
+
+
+        // $('.select2bs4').on("change.select2", function (e) {
+        //     // $(this).val('').trigger('change');
+        //     // e.preventDefault();
+        //     var data = e.params.data;
+        //     console.log(data);
+        // });
+
+        // $('.select2bs4').on("select2:unselecting", function (e) {
+        //     $(this).val('').trigger('change');
+        //     e.preventDefault();
+        // });
+
+        //$(".select2bs4").val('').trigger('change');
+
         $('.datenya').datepicker({
             autoclose: true,
             todayHighlight: true,
