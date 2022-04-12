@@ -384,6 +384,10 @@ class KasiController extends Controller
         $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
         $table2->addCell(3900, $styleCell)->addText($data->npwp, array('align' => 'center'));
         $table2->addRow();
+        $table2->addCell(3800, $styleCell)->addText('Nama Wajib Pajak', array('align' => 'center'));
+        $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
+        $table2->addCell(3900, $styleCell)->addText($data->nama_wajib_pajak, array('align' => 'center'));
+        $table2->addRow();
         $table2->addCell(3800, $styleCell)->addText('Jenis Permohonan', array('align' => 'center'));
         $table2->addCell(100, $styleCell)->addText(':', array('align' => 'center'));
         $table2->addCell(3900, $styleCell)->addText($data->jenis_permohonan, array('align' => 'center'));
