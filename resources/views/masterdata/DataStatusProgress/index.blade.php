@@ -202,7 +202,21 @@
         }); 
     }
     function buttonDeleteSt(data){
-        window.location.href = data.getAttribute('data-link');
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda tidak akan dapat mengembalikan data!",
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus',
+            cancelButtonColor: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = data.getAttribute('data-link');
+            }
+        });
     }
 
     $('#table-p').DataTable({
@@ -242,6 +256,20 @@
         }); 
     }
     function buttonDeletePr(data){
-        window.location.href = data.getAttribute('data-link');
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda tidak akan dapat mengembalikan data!",
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus',
+            cancelButtonColor: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = data.getAttribute('data-link');
+            }
+        });
     }
 </script>

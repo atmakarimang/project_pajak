@@ -30,35 +30,38 @@ class NonPelaksanaBidangController extends Controller
     {
         // $this->middleware('auth');
     }
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $data = [];
         $user = Auth::user();
         $mode = $request->mode;
         $dtStatus = Status::whereIn('status', ['Diarsipkan', 'Ditindaklanjuti', 'Lain - lain'])->get();
         $dtSeksiKonsep = SeksiKonseptor::get();
         $dtKepsek = AnggotaSeksi::get();
-        $mode = $request->mode; $data["mode"] = $mode;
-        $no_agenda = base64_decode($request->no);$data["no_agenda"] = $no_agenda;
-        $dtPB = NonPelaksanaBidang::where('no_agenda','=',$no_agenda)->first();
-        if(empty($dtPB)) {
+        $mode = $request->mode;
+        $data["mode"] = $mode;
+        $no_agenda = base64_decode($request->no);
+        $data["no_agenda"] = $no_agenda;
+        $dtPB = NonPelaksanaBidang::where('no_agenda', '=', $no_agenda)->first();
+        if (empty($dtPB)) {
             $dtPB = new NonPelaksanaBidang;
-        }else{
-            $dtPB = NonPelaksanaBidang::where('no_agenda','=',$no_agenda)->first();
+        } else {
+            $dtPB = NonPelaksanaBidang::where('no_agenda', '=', $no_agenda)->first();
         }
         //set otomatis no agenda
         // 7 digit angka depan = nomor urut, 2 digit angka belakang = tahun P-0000001-21
-        
-        $datenow = substr(date('Y'),-2);
+
+        $datenow = substr(date('Y'), -2);
         $tahun = date('Y');
-        $maxval = NonPelaksanaBidang::where('tahun',$tahun)->max('no');
-        $no_agenda = "NP-0000001-".$datenow;
-        if($maxval){
+        $maxval = NonPelaksanaBidang::where('tahun', $tahun)->max('no');
+        $no_agenda = "NP-0000001-" . $datenow;
+        if ($maxval) {
             $noUrut = $maxval;
             $noInt = (int)$noUrut;
             $noInt++;
-            $no_agenda = "NP-" .str_pad($noInt, 7, "0",  STR_PAD_LEFT)."-".$datenow;
+            $no_agenda = "NP-" . str_pad($noInt, 7, "0",  STR_PAD_LEFT) . "-" . $datenow;
         }
-        
+
         $data["mode"] = $mode;
         $data['user'] = $user;
         $data['dtPB'] = $dtPB;
@@ -67,89 +70,94 @@ class NonPelaksanaBidangController extends Controller
         $data['dtKepsek'] = $dtKepsek;
         $data['no_agenda'] = $no_agenda;
 
-        return view($this->PATH_VIEW.'index',$data);
+        return view($this->PATH_VIEW . 'index', $data);
     }
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $mode = strtolower($request->input("mode"));
-    	$results = $request->all();
-    	$error = 0;
-    	DB::beginTransaction();
-        if($mode=="edit"){
+        $results = $request->all();
+        $error = 0;
+        DB::beginTransaction();
+        if ($mode == "edit") {
             $no_agenda = $request->no_agenda;
-            $pb = NonPelaksanaBidang::where('no_agenda',$no_agenda)->first();
+            $pb = NonPelaksanaBidang::where('no_agenda', $no_agenda)->first();
             try {
-                $data = NonPelaksanaBidang::updateDt($request,$pb);
-            }catch(\Exception $e) {
-    			$devError = new DevError;
-	            $devError->form = "Update Pelaksana Bidang";
-	            $devError->url = $request->path();
-	            $devError->error = $e;
-	            $devError->data = json_encode($request->input());
-	            $devError->created_at = date("Y:m:d H:i:s");
-	            $devError->save();
-	            DB::commit();
-	            $error++;
-	            DB::rollBack();
-	            $flashs[] = [
-	                'type' => 'error', // option : info, warning, success, error
-	                'title' => 'Error',
-	                'message' => "Pelaksana Bidang gagal diperbaharui!",
-	            ];
-	        }
-        }else{
-            try {
-    			$data = NonPelaksanaBidang::create($request);
-    		}catch(\Exception $e) {
-    			$devError = new DevError;
-	            $devError->form = "Add Pelaksana Bidang";
-	            $devError->url = $request->path();
-	            $devError->error = $e;
-	            $devError->data = json_encode($request->input());
-	            $devError->created_at = date("Y:m:d H:i:s");
-	            $devError->save();
-	            DB::commit();
-	            $error++;
-	            DB::rollBack();
-	            $flashs[] = [
-	                'type' => 'error', // option : info, warning, success, error
-	                'title' => 'Error',
-	                'message' => "Pelaksana Bidang gagal disimpan!",
-	            ];
-	        }
-        }
-        if($error == 0) {
-    		DB::commit();
-            if($mode == 'add'){
+                $data = NonPelaksanaBidang::updateDt($request, $pb);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Update Pelaksana Bidang";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
                 $flashs[] = [
-                    'type' => 'success', // option : info, warning, success, error
-                    'title' => 'Success',
-                    'message' => $request->no_agenda.' telah ditambahkan!',
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Pelaksana Bidang gagal diperbaharui!",
                 ];
-            }else{
+            }
+        } else {
+            try {
+                $data = NonPelaksanaBidang::create($request);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add Pelaksana Bidang";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
+                $flashs[] = [
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Pelaksana Bidang gagal disimpan!",
+                ];
+            }
+        }
+        if ($error == 0) {
+            DB::commit();
+            if ($mode == 'add') {
                 $flashs[] = [
                     'type' => 'success', // option : info, warning, success, error
                     'title' => 'Success',
-                    'message' => $request->no_agenda.' telah diupdated!',
+                    'message' => $request->no_agenda . ' telah ditambahkan!',
+                ];
+            } else {
+                $flashs[] = [
+                    'type' => 'success', // option : info, warning, success, error
+                    'title' => 'Success',
+                    'message' => $request->no_agenda . ' telah diupdated!',
                 ];
             }
         }
 
         $data["flashs"] = $flashs;
-    	// return redirect()->back()->with($data);
-        if($mode=="edit"){
+        // return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
+
+        if ($mode == "edit") {
             return redirect()->back();
-        }else{
+        } else {
             return redirect()->route('nonpelaksanabidang.index');
         }
     }
-    public function browse(Request $request){
+    public function browse(Request $request)
+    {
         $user = Auth::user();
         $page = \Request::get('page');
         $data['user'] = $user;
-        return view($this->PATH_VIEW.'browse',$data);
+        return view($this->PATH_VIEW . 'browse', $data);
     }
 
-    public function datatablePB(Request $request){
+    public function datatablePB(Request $request)
+    {
         $start = $request->input('start');
         $length = $request->input('length');
         $draw = $request->input('draw');
@@ -162,39 +170,38 @@ class NonPelaksanaBidangController extends Controller
         $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
         $orderType = $order_arr['dir']; // ASC or DESC
         $orderBy = $request->input('columns');
-        $orderBy = $orderBy[$orderByColumnIndex]['name'];//Get name of the sorting column from its index
+        $orderBy = $orderBy[$orderByColumnIndex]['name']; //Get name of the sorting column from its index
         $limit = $length;
         $offset = $start;
 
-        $jumlahTotal = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
-                    ->orWhereNull('status_dokumen')
-                    ->count();
-        
+        $jumlahTotal = NonPelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+            ->orWhereNull('status_dokumen')
+            ->count();
+
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
             OR nama_wajib_pajak like lower('%{$search}%') OR no_surat like lower('%{$search}%')
             OR asal_surat like lower('%{$search}%') OR status like lower('%{$search}%')";
-            $jumlahFiltered = NonPelaksanaBidang::whereRaw("{$where}") ->count(); //hitung data yang telah terfilter
-            if($orderBy !=null){
-                $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
+            $jumlahFiltered = NonPelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
+            if ($orderBy != null) {
+                $data = NonPelaksanaBidang::where('status_dokumen', '<>', 'Delete')
                     ->orWhereNull('status_dokumen')
                     ->whereRaw($where)->orderBy($orderBy, $orderType)->get();
-            }else{
-                $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
+            } else {
+                $data = NonPelaksanaBidang::where('status_dokumen', '<>', 'Delete')
                     ->orWhereNull('status_dokumen')
                     ->whereRaw($where)
                     ->get();
             }
-            
         } else {
             $jumlahFiltered = $jumlahTotal;
-            if($orderBy !=null){
-                $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
+            if ($orderBy != null) {
+                $data = NonPelaksanaBidang::where('status_dokumen', '<>', 'Delete')
                     ->orWhereNull('status_dokumen')
                     ->offset($offset)
-                    ->limit($limit)->orderBy($orderBy,$orderType)->get();
-            }else{
-                $data = NonPelaksanaBidang::where('status_dokumen','<>','Delete')
+                    ->limit($limit)->orderBy($orderBy, $orderType)->get();
+            } else {
+                $data = NonPelaksanaBidang::where('status_dokumen', '<>', 'Delete')
                     ->orWhereNull('status_dokumen')
                     ->offset($offset)
                     ->limit($limit)->get();
@@ -202,29 +209,29 @@ class NonPelaksanaBidangController extends Controller
         }
         $result = [];
         foreach ($data as $no => $dt) {
-            $linkedit = url('/nonpermohonan/nonpelaksana-bidang?mode=edit&no='.base64_encode($dt->no_agenda));
-            $linkdelete = url('/nonpermohonan/nonpelaksana-bidang/delete',base64_encode($dt->no_agenda));
+            $linkedit = url('/nonpermohonan/nonpelaksana-bidang?mode=edit&no=' . base64_encode($dt->no_agenda));
+            $linkdelete = url('/nonpermohonan/nonpelaksana-bidang/delete', base64_encode($dt->no_agenda));
             $action = '<center>
-                            <a href="'.$linkedit.'">
+                            <a href="' . $linkedit . '">
                                 <button data-toggle="tooltip" title="Edit" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-pencil-alt"></i></button>
                             </a>
-                            <button onclick="buttonDelete(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
+                            <button onclick="buttonDelete(this)" data-link="' . $linkdelete . '" data-toggle="tooltip" title="Delete" type="button" class="btn btn-xs btn-default btn-circle"><i class="fas fa-trash"></i></button>
                         </center>';
-                        
-             if($dt->status == 'Ditindaklanjuti'){
+
+            if ($dt->status == 'Ditindaklanjuti') {
                 $badge = 'badge-success';
-             }else if($dt->status == 'Diarsipkan'){
+            } else if ($dt->status == 'Diarsipkan') {
                 $badge = 'badge-danger';
-             }else if($dt->status == 'Lain - lain'){
+            } else if ($dt->status == 'Lain - lain') {
                 $badge = 'badge-warning';
-             }else{
+            } else {
                 $badge = 'badge-info';
-             }
+            }
             $status = '<center>
-                            <span class="badge '.$badge.'">'.$dt->status.'</span>
+                            <span class="badge ' . $badge . '">' . $dt->status . '</span>
                         </center>';
             $result[] = [
-                $start + $no+1,
+                $start + $no + 1,
                 $dt->no_agenda,
                 $dt->no_surat,
                 $dt->asal_surat,
@@ -235,7 +242,8 @@ class NonPelaksanaBidangController extends Controller
             ];
         }
         echo json_encode(
-            array('draw' => $draw,
+            array(
+                'draw' => $draw,
                 'recordsTotal' => $jumlahTotal,
                 'recordsFiltered' => $jumlahFiltered,
                 'data' => $result,
@@ -243,16 +251,21 @@ class NonPelaksanaBidangController extends Controller
         );
     }
 
-    public function delete($no_agenda){
+    public function delete($no_agenda)
+    {
         $no_agenda = base64_decode($no_agenda);
-        NonPelaksanaBidang::where('no_agenda',$no_agenda)->update(['status_dokumen' => 'Delete']);
+        NonPelaksanaBidang::where('no_agenda', $no_agenda)->update(['status_dokumen' => 'Delete']);
+
+        toast('Data sudah berhasil dihapus', 'success');
+
         return redirect()->back();
     }
 
-    public function print($no_agenda){
+    public function print($no_agenda)
+    {
         $noagen = base64_decode($no_agenda);
-        $data = NonPelaksanaBidang::where('no_agenda','=',$noagen)->first();
-        if(!$data){
+        $data = NonPelaksanaBidang::where('no_agenda', '=', $noagen)->first();
+        if (!$data) {
             // $msg = notifErrorHelper('Wrong Action','Error');
             // return redirect()->back()->with('flashs',$msg);
             return redirect()->back();
@@ -314,8 +327,8 @@ class NonPelaksanaBidangController extends Controller
         $sheet->setCellValue('A2', $data->no_agenda);
         $sheet->setCellValue('B2', $data->tgl_agenda);
         $sheet->setCellValue('C2', $data->no_surat);
-        $sheet->setCellValue('D2', date("d-m-Y",strtotime($data->tgl_surat)));
-        $sheet->setCellValue('E2', date("d-m-Y",strtotime($data->tgl_diterima_kanwil)));
+        $sheet->setCellValue('D2', date("d-m-Y", strtotime($data->tgl_surat)));
+        $sheet->setCellValue('E2', date("d-m-Y", strtotime($data->tgl_diterima_kanwil)));
         $sheet->setCellValue('F2', $data->asal_surat);
         $sheet->setCellValue('G2', $data->hal);
         $sheet->setCellValue('H2', $data->npwp);
@@ -324,7 +337,7 @@ class NonPelaksanaBidangController extends Controller
         $sheet->setCellValue('K2', $data->kepala_seksi);
         $sheet->setCellValue('L2', $data->penerima_disposisi);
         $sheet->setCellValue('M2', $data->status);
-        
+
         $header_style_border = [
             'borders' => [
                 'bottom' => [
@@ -343,13 +356,13 @@ class NonPelaksanaBidangController extends Controller
         ];
         $sheet->getStyle('A1:M1')->applyFromArray($header_style_border);
         header("Content-Description: File Transfer");
-        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang '.$noagen.'.xls');
+        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang ' . $noagen . '.xls');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
         $writer = new Xls($spreadsheet);
         $writer->save("php://output");
-        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang '.$noagen.'.xls');
+        header('Content-Disposition: attachment; filename="Non Pelaksana Bidang ' . $noagen . '.xls');
     }
 }

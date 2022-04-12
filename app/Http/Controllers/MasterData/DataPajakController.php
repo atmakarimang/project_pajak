@@ -18,38 +18,40 @@ class DataPajakController extends Controller
     // {
     //     $this->middleware('auth');
     // }
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $data = [];
         $user = Auth::user();
         $mode = $request->mode;
         $data["mode"] = $mode;
         $data['user'] = $user;
 
-        return view($this->PATH_VIEW.'index',$data);
+        return view($this->PATH_VIEW . 'index', $data);
     }
-    public function storePajak(Request $request){
+    public function storePajak(Request $request)
+    {
         $user = Auth::user();
-    	$mode = strtolower($request->input("mode"));
-    	$results = $request->all();
-    	$error = 0;
-        $cek_data = Pajak::where('pajak',$request->pajak)->count();
-        if($cek_data>0){
+        $mode = strtolower($request->input("mode"));
+        $results = $request->all();
+        $error = 0;
+        $cek_data = Pajak::where('pajak', $request->pajak)->count();
+        if ($cek_data > 0) {
             $error_duplikat[] = [
                 'type' => 'success', // option : info, warning, success, error
                 'title' => 'Success',
-                'message' => 'Pajak '.$request->pajak.' sudah ada!',
+                'message' => 'Pajak ' . $request->pajak . ' sudah ada!',
             ];
             $data["error_duplikat"] = $error_duplikat;
             // return redirect()->back()->with($data);
             return redirect()->back();
         }
-    	DB::beginTransaction();
-    	if($mode=="edit"){
-    		$id = $request->id_pj;
-            $pj = Pajak::where('id',$id)->first();
+        DB::beginTransaction();
+        if ($mode == "edit") {
+            $id = $request->id_pj;
+            $pj = Pajak::where('id', $id)->first();
             try {
-                $data = Pajak::updateDt($request,$pj);
-            }catch(\Exception $e) {
+                $data = Pajak::updateDt($request, $pj);
+            } catch (\Exception $e) {
                 $devError = new DevError;
                 $devError->form = "Update Pajak";
                 $devError->url = $request->path();
@@ -66,50 +68,52 @@ class DataPajakController extends Controller
                     'message' => "Pajak gagal diupdated!",
                 ];
             }
-    	}else{
-    		try {
-    			$data = Pajak::create($request);
-    		}catch(\Exception $e) {
-    			$devError = new DevError;
-	            $devError->form = "Add Pajak";
-	            $devError->url = $request->path();
-	            $devError->error = $e;
-	            $devError->data = json_encode($request->input());
-	            $devError->created_at = date("Y:m:d H:i:s");
-	            $devError->save();
-	            DB::commit();
-	            $error++;
-	            DB::rollBack();
-	            $flashs[] = [
-	                'type' => 'error', // option : info, warning, success, error
-	                'title' => 'Error',
-	                'message' => "Pajak gagal disimpan!",
-	            ];
-	        }
-    	}
-
-    	if($error == 0) {
-    		DB::commit();
-            if($mode == 'add'){
+        } else {
+            try {
+                $data = Pajak::create($request);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add Pajak";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
                 $flashs[] = [
-                    'type' => 'success', // option : info, warning, success, error
-                    'title' => 'Success',
-                    'message' => 'Pajak '.$request->pajak.' telah ditambahkan!',
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Pajak gagal disimpan!",
                 ];
-            }else{
+            }
+        }
+
+        if ($error == 0) {
+            DB::commit();
+            if ($mode == 'add') {
                 $flashs[] = [
                     'type' => 'success', // option : info, warning, success, error
                     'title' => 'Success',
-                    'message' => 'Pajak '.$request->pajak.' telah diupdated!',
+                    'message' => 'Pajak ' . $request->pajak . ' telah ditambahkan!',
+                ];
+            } else {
+                $flashs[] = [
+                    'type' => 'success', // option : info, warning, success, error
+                    'title' => 'Success',
+                    'message' => 'Pajak ' . $request->pajak . ' telah diupdated!',
                 ];
             }
         }
 
         $data["flashs"] = $flashs;
-    	// return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
+        // return redirect()->back()->with($data);
         return redirect()->route('pajak.index');
     }
-    public function ajaxDataPajak(Request $request){
+    public function ajaxDataPajak(Request $request)
+    {
         $start = $request->input('start');
         $length = $request->input('length');
         $draw = $request->input('draw');
@@ -122,7 +126,7 @@ class DataPajakController extends Controller
         $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
         $orderType = $order_arr['dir']; // ASC or DESC
         $orderBy = $request->input('columns');
-        $orderBy = $orderBy[$orderByColumnIndex]['name'];//Get name of the sorting column from its index
+        $orderBy = $orderBy[$orderByColumnIndex]['name']; //Get name of the sorting column from its index
 
         if ($orderBy && $orderType) {
             $orderBy = $orderBy;
@@ -135,7 +139,7 @@ class DataPajakController extends Controller
         $limit = $length;
         $offset = $start;
         $jumlahTotal = Pajak::count();
-        
+
         if ($search) { // filter data
             $where = "pajak like lower('%{$search}%')";
             $jumlahFiltered = Pajak::whereRaw("{$where}")->orderBy($orderBy, $orderType)
@@ -159,8 +163,8 @@ class DataPajakController extends Controller
             $linkdelete = url('master-data/deletePj', $dt->id);
             $action = '<center>
                                 <div class="btn-group btn-group-sm">
-                            <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle" onclick="editPj(\''.$dt->id.'\')"><i class="fas fa-pencil-alt"></i></button>
-                            <button onclick="buttonDeletePj(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-danger btn-circle"><i class="fas fa-trash"></i></button>
+                            <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-primary btn-circle" onclick="editPj(\'' . $dt->id . '\')"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="buttonDeletePj(this)" data-link="' . $linkdelete . '" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-danger btn-circle"><i class="fas fa-trash"></i></button>
                             </div>
                             </center>';
             $result[] = [
@@ -170,7 +174,8 @@ class DataPajakController extends Controller
             ];
         }
         echo json_encode(
-            array('draw' => $draw,
+            array(
+                'draw' => $draw,
                 'recordsTotal' => $jumlahTotal,
                 'recordsFiltered' => $jumlahFiltered,
                 'data' => $result,
@@ -180,38 +185,41 @@ class DataPajakController extends Controller
     public function editPj(Request $request)
     {
         $id = $request->id;
-        $dt = Pajak::where('id',$id)->first();
+        $dt = Pajak::where('id', $id)->first();
 
         echo json_encode($dt);
     }
-    public function deletePj($id){
-        Pajak::where('id',$id)->delete();
+    public function deletePj($id)
+    {
+        Pajak::where('id', $id)->delete();
+        toast('Data sudah berhasil dihapus', 'success');
         return redirect()->back();
     }
 
-    public function storeJK(Request $request){
+    public function storeJK(Request $request)
+    {
         $user = Auth::user();
-    	$mode = strtolower($request->input("mode"));
-    	$results = $request->all();
-    	$error = 0;
-        $cek_data = Ketetapan::where('jenis_ketetapan',$request->jenis_ketetapan)->count();
-        if($cek_data>0){
+        $mode = strtolower($request->input("mode"));
+        $results = $request->all();
+        $error = 0;
+        $cek_data = Ketetapan::where('jenis_ketetapan', $request->jenis_ketetapan)->count();
+        if ($cek_data > 0) {
             $error_duplikat[] = [
                 'type' => 'success', // option : info, warning, success, error
                 'title' => 'Success',
-                'message' => 'Jenis Ketetapan '.$request->jenis_ketetapan.' sudah ada!',
+                'message' => 'Jenis Ketetapan ' . $request->jenis_ketetapan . ' sudah ada!',
             ];
             $data["error_duplikat"] = $error_duplikat;
             // return redirect()->back()->with($data);
             return redirect()->back();
         }
-    	DB::beginTransaction();
-    	if($mode=="edit"){
-    		$id = $request->id_jk;
-            $jk = Ketetapan::where('id',$id)->first();
+        DB::beginTransaction();
+        if ($mode == "edit") {
+            $id = $request->id_jk;
+            $jk = Ketetapan::where('id', $id)->first();
             try {
-                $data = Ketetapan::updateDt($request,$jk);
-            }catch(\Exception $e) {
+                $data = Ketetapan::updateDt($request, $jk);
+            } catch (\Exception $e) {
                 $devError = new DevError;
                 $devError->form = "Update Jenis Ketetapan";
                 $devError->url = $request->path();
@@ -228,50 +236,52 @@ class DataPajakController extends Controller
                     'message' => "Jenis Ketetapan gagal diupdated!",
                 ];
             }
-    	}else{
-    		try {
-    			$data = Ketetapan::create($request);
-    		}catch(\Exception $e) {
-    			$devError = new DevError;
-	            $devError->form = "Add Jenis Ketetapan";
-	            $devError->url = $request->path();
-	            $devError->error = $e;
-	            $devError->data = json_encode($request->input());
-	            $devError->created_at = date("Y:m:d H:i:s");
-	            $devError->save();
-	            DB::commit();
-	            $error++;
-	            DB::rollBack();
-	            $flashs[] = [
-	                'type' => 'error', // option : info, warning, success, error
-	                'title' => 'Error',
-	                'message' => "Jenis Ketetapan gagal disimpan!",
-	            ];
-	        }
-    	}
-
-    	if($error == 0) {
-    		DB::commit();
-            if($mode == 'add'){
+        } else {
+            try {
+                $data = Ketetapan::create($request);
+            } catch (\Exception $e) {
+                $devError = new DevError;
+                $devError->form = "Add Jenis Ketetapan";
+                $devError->url = $request->path();
+                $devError->error = $e;
+                $devError->data = json_encode($request->input());
+                $devError->created_at = date("Y:m:d H:i:s");
+                $devError->save();
+                DB::commit();
+                $error++;
+                DB::rollBack();
                 $flashs[] = [
-                    'type' => 'success', // option : info, warning, success, error
-                    'title' => 'Success',
-                    'message' => 'Jenis Ketetapan '.$request->jenis_ketetapan.' telah ditambahkan!',
+                    'type' => 'error', // option : info, warning, success, error
+                    'title' => 'Error',
+                    'message' => "Jenis Ketetapan gagal disimpan!",
                 ];
-            }else{
+            }
+        }
+
+        if ($error == 0) {
+            DB::commit();
+            if ($mode == 'add') {
                 $flashs[] = [
                     'type' => 'success', // option : info, warning, success, error
                     'title' => 'Success',
-                    'message' => 'Jenis Ketetapan '.$request->jenis_ketetapan.' telah diupdated!',
+                    'message' => 'Jenis Ketetapan ' . $request->jenis_ketetapan . ' telah ditambahkan!',
+                ];
+            } else {
+                $flashs[] = [
+                    'type' => 'success', // option : info, warning, success, error
+                    'title' => 'Success',
+                    'message' => 'Jenis Ketetapan ' . $request->jenis_ketetapan . ' telah diupdated!',
                 ];
             }
         }
 
         $data["flashs"] = $flashs;
-    	// return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
+        // return redirect()->back()->with($data);
         return redirect()->route('pajak.index');
     }
-    public function ajaxDataJK(Request $request){
+    public function ajaxDataJK(Request $request)
+    {
         $start = $request->input('start');
         $length = $request->input('length');
         $draw = $request->input('draw');
@@ -284,7 +294,7 @@ class DataPajakController extends Controller
         $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
         $orderType = $order_arr['dir']; // ASC or DESC
         $orderBy = $request->input('columns');
-        $orderBy = $orderBy[$orderByColumnIndex]['name'];//Get name of the sorting column from its index
+        $orderBy = $orderBy[$orderByColumnIndex]['name']; //Get name of the sorting column from its index
 
         if ($orderBy && $orderType) {
             $orderBy = $orderBy;
@@ -297,7 +307,7 @@ class DataPajakController extends Controller
         $limit = $length;
         $offset = $start;
         $jumlahTotal = Ketetapan::count();
-        
+
         if ($search) { // filter data
             $where = "jenis_ketetapan like lower('%{$search}%')";
             $jumlahFiltered = Ketetapan::whereRaw("{$where}")->orderBy($orderBy, $orderType)
@@ -321,8 +331,8 @@ class DataPajakController extends Controller
             $linkdelete = url('master-data/deleteJk', $dt->id);
             $action = '<center>
                                 <div class="btn-group btn-group-sm">
-                            <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-info btn-circle" onclick="editJk(\''.$dt->id.'\')"><i class="fas fa-pencil-alt"></i></button>
-                            <button onclick="buttonDeleteJk(this)" data-link="'.$linkdelete.'" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-danger btn-circle"><i class="fas fa-trash"></i></button>
+                            <button data-toggle="tooltip" data-original-title="Edit" type="button" class="btn btn-xs btn-info btn-circle" onclick="editJk(\'' . $dt->id . '\')"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="buttonDeleteJk(this)" data-link="' . $linkdelete . '" data-toggle="tooltip" data-original-title="Delete" type="button" class="btn btn-xs btn-danger btn-circle"><i class="fas fa-trash"></i></button>
                             </div>
                             </center>';
             $result[] = [
@@ -332,7 +342,8 @@ class DataPajakController extends Controller
             ];
         }
         echo json_encode(
-            array('draw' => $draw,
+            array(
+                'draw' => $draw,
                 'recordsTotal' => $jumlahTotal,
                 'recordsFiltered' => $jumlahFiltered,
                 'data' => $result,
@@ -342,13 +353,14 @@ class DataPajakController extends Controller
     public function editJk(Request $request)
     {
         $id = $request->id;
-        $dt = Ketetapan::where('id',$id)->first();
+        $dt = Ketetapan::where('id', $id)->first();
 
         echo json_encode($dt);
     }
-    public function deleteJk($id){
-        Ketetapan::where('id',$id)->delete();
+    public function deleteJk($id)
+    {
+        Ketetapan::where('id', $id)->delete();
+        toast('Data sudah berhasil dihapus', 'success');
         return redirect()->back();
     }
-    
 }

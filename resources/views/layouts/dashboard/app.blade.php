@@ -50,6 +50,7 @@
   </div>
   <!-- ./wrapper -->
   @include('layouts.dashboard.javascript')
+  
 </body>
 
 </html>

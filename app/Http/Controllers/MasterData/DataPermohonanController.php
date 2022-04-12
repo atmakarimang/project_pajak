@@ -113,6 +113,7 @@ class DataPermohonanController extends Controller
 
         $data["flashs"] = $flashs;
         // return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
         return redirect()->route('permohonan.index');
     }
     public function storeJP(Request $request)
@@ -196,6 +197,7 @@ class DataPermohonanController extends Controller
 
         $data["flashs"] = $flashs;
         // return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
         return redirect()->route('permohonan.index');
     }
     public function storeKP(Request $request)
@@ -279,6 +281,7 @@ class DataPermohonanController extends Controller
 
         $data["flashs"] = $flashs;
         // return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
         return redirect()->route('permohonan.index');
     }
     public function ajaxDataPemohon(Request $request)
@@ -352,6 +355,7 @@ class DataPermohonanController extends Controller
     public function deletePemohon($id)
     {
         AsalPermohonan::where('id', $id)->delete();
+        toast('Data sudah berhasil dihapus', 'success');
         return redirect()->back();
     }
     public function ajaxDataJP(Request $request)
@@ -424,6 +428,7 @@ class DataPermohonanController extends Controller
     public function deleteJP($id)
     {
         JenisPermohonan::where('id', $id)->delete();
+        toast('Data sudah berhasil dihapus', 'success');
         return redirect()->back();
     }
     public function ajaxDataKP(Request $request)
@@ -496,6 +501,7 @@ class DataPermohonanController extends Controller
     public function deleteKP($id)
     {
         KategoriPermohonan::where('id', $id)->delete();
+        toast('Data sudah berhasil dihapus', 'success');
         return redirect()->back();
     }
 }

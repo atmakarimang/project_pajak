@@ -21,6 +21,7 @@ use App\Models\KriteriaPermohonan;
 use App\Models\PenelaahKeberatan;
 use App\Models\User;
 use DB;
+use Session;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -44,6 +45,7 @@ class KasiController extends Controller
     }
     public function index(Request $request)
     {
+        // Session::flash('backUrl', Request::fullUrl());
         $data = [];
         $user = Auth::user();
         $mode = $request->mode;
@@ -55,6 +57,8 @@ class KasiController extends Controller
     }
     public function datatableKasi(Request $request)
     {
+        // Session::flash('backUrl', Request::fullUrl());
+
         $user = User::where('user_id', session('user_id'))->first();
         $start = $request->input('start');
         $length = $request->input('length');
@@ -292,7 +296,17 @@ class KasiController extends Controller
         }
 
         $data["flashs"] = $flashs;
+
+        toast($flashs[0]['message'], $flashs[0]['type']);
+
         return redirect()->route('kasi.index');
+        // if (Session::has('backUrl')) {
+        //     Session::keep('backUrl');
+        // }
+        // return ($url = Session::get('backUrl')) 
+        // ? Redirect::to($url) 
+        // : Redirect::route('kasi.index');
+        // return redirect()->back();
     }
     public function printLabel($no_agenda, $docExt)
     {
@@ -505,39 +519,39 @@ class KasiController extends Controller
         $sheet->setCellValue('C1', 'Nomor Naskah Dinas');
         $sheet->setCellValue('D1', 'Tanggal Naskah Dinas');
         $sheet->setCellValue('E1', 'Asal Permohonan');
-        $sheet->setCellValue('F1', 'Nomor Lembar Pengawasan Arus Dokumen');
-        $sheet->setCellValue('G1', 'Tanggal diterima KPP');
-        $sheet->setCellValue('H1', 'Tanggal diterima Kanwil');
-        $sheet->setCellValue('I1', 'Nomor Pokok Wajib Pajak');
-        $sheet->setCellValue('J1', 'Nama Wajib Pajak');
-        $sheet->setCellValue('K1', 'Jenis Permohonan');
-        $sheet->setCellValue('L1', 'Jenis Pajak');
-        $sheet->setCellValue('M1', 'Jenis Ketetapan');
-        $sheet->setCellValue('N1', 'Nomor Ketetapan');
-        $sheet->setCellValue('O1', 'Tanggal Ketetapan');
-        $sheet->setCellValue('P1', 'Masa Pajak');
-        $sheet->setCellValue('Q1', 'Tahun Pajak');
-        $sheet->setCellValue('R1', 'Kategori Permohonan');
-        $sheet->setCellValue('S1', 'Nomor Surat Permohonan');
-        $sheet->setCellValue('T1', 'Tanggal Surat Permohonan');
-        $sheet->setCellValue('U1', 'Seksi Konseptor');
-        $sheet->setCellValue('V1', 'Kepala Seksi');
-        $sheet->setCellValue('W1', 'PK Konseptor');
+        $sheet->setCellValue('F1', 'Nama Wajib Pajak');
+        $sheet->setCellValue('G1', 'Nomor Pokok Wajib Pajak');
+        $sheet->setCellValue('H1', 'Jenis Permohonan');
+        $sheet->setCellValue('I1', 'Kategori Permohonan');
+        $sheet->setCellValue('J1', 'Tanggal diterima KPP');
+        $sheet->setCellValue('K1', 'Nomor Lembar Pengawasan Arus Dokumen');
+        $sheet->setCellValue('L1', 'Tanggal diterima Kanwil');
+        $sheet->setCellValue('M1', 'Seksi Konseptor');
+        $sheet->setCellValue('N1', 'PK Konseptor');
+        $sheet->setCellValue('O1', 'Nomor Surat Permohonan');
+        $sheet->setCellValue('P1', 'Tanggal Surat Permohonan');
+        $sheet->setCellValue('Q1', 'Jenis Ketetapan');
+        $sheet->setCellValue('R1', 'Jenis Pajak');
+        $sheet->setCellValue('S1', 'Nomor Ketetapan');
+        $sheet->setCellValue('T1', 'Tanggal Ketetapan');
+        $sheet->setCellValue('U1', 'Masa Pajak');
+        $sheet->setCellValue('V1', 'Tahun Pajak');
+        $sheet->setCellValue('W1', 'Status');
         $sheet->setCellValue('X1', 'Nomor Produk Hukum');
         $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
-        $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
-        $sheet->setCellValue('AA1', 'Tambah');
-        $sheet->setCellValue('AB1', 'Kurang');
-        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
-        $sheet->setCellValue('AD1', 'Hasil Keputusan');
-        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
-        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
-        $sheet->setCellValue('AI1', 'Status');
-        $sheet->setCellValue('AJ1', 'Progress');
-        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('Z1', 'Kurang');
+        $sheet->setCellValue('AA1', 'Hasil Keputusan Tambah');
+        $sheet->setCellValue('AB1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AC1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('AD1', 'Progress');
+        $sheet->setCellValue('AE1', 'Jumlah yang Masih Harus Dibayar Semula');
+        $sheet->setCellValue('AF1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AG1', 'Kepala Seksi');
+        $sheet->setCellValue('AH1', 'Tambah');
+        $sheet->setCellValue('AI1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AJ1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AK1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AL1', 'Tanggal Surat Pengantar');
 
         $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
         $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
@@ -548,39 +562,39 @@ class KasiController extends Controller
         $sheet->setCellValue('C2', $data->no_naskah_dinas);
         $sheet->setCellValue('D2', date("d-m-Y", strtotime($data->tgl_naskah_dinas)));
         $sheet->setCellValue('E2', $data->pemohon);
-        $sheet->setCellValue('F2', $data->no_lbr_pengawas_dok);
-        $sheet->setCellValue('G2', date("d-m-Y", strtotime($data->tgl_diterima_kpp)));
-        $sheet->setCellValue('H2', date("d-m-Y", strtotime($data->tgl_diterima_kanwil)));
-        $sheet->setCellValue('I2', $data->npwp);
-        $sheet->setCellValue('J2', $data->nama_wajib_pajak);
-        $sheet->setCellValue('K2', $data->jenis_permohonan);
-        $sheet->setCellValue('L2', $data->pajak);
-        $sheet->setCellValue('M2', $data->jenis_ketetapan);
-        $sheet->setCellValue('N2', $data->no_ketetapan);
-        $sheet->setCellValue('O2', date("d-m-Y", strtotime($data->tgl_ketetapan)));
-        $sheet->setCellValue('P2', $data->masa_pajak);
-        $sheet->setCellValue('Q2', $data->tahun_pajak);
-        $sheet->setCellValue('R2', $data->kat_permohonan);
-        $sheet->setCellValue('S2', $data->no_srt_permohonan);
-        $sheet->setCellValue('T2', date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
-        $sheet->setCellValue('U2', $data->seksi_konseptor);
-        $sheet->setCellValue('V2', $data->kepala_seksi);
-        $sheet->setCellValue('W2', $data->pk_konseptor);
+        $sheet->setCellValue('F2', $data->nama_wajib_pajak);
+        $sheet->setCellValue('G2', $data->npwp);
+        $sheet->setCellValue('H2', $data->jenis_permohonan);
+        $sheet->setCellValue('I2', $data->kat_permohonan);
+        $sheet->setCellValue('J2', date("d-m-Y", strtotime($data->tgl_diterima_kpp)));
+        $sheet->setCellValue('K2', $data->no_lbr_pengawas_dok);
+        $sheet->setCellValue('L2', date("d-m-Y", strtotime($data->tgl_diterima_kanwil)));
+        $sheet->setCellValue('M2', $data->seksi_konseptor);
+        $sheet->setCellValue('N2', $data->pk_konseptor);
+        $sheet->setCellValue('O2', $data->no_srt_permohonan);
+        $sheet->setCellValue('P2', date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
+        $sheet->setCellValue('Q2', $data->jenis_ketetapan);
+        $sheet->setCellValue('R2',  $data->pajak);
+        $sheet->setCellValue('S2', $data->no_ketetapan);
+        $sheet->setCellValue('T2', date("d-m-Y", strtotime($data->tgl_ketetapan)));
+        $sheet->setCellValue('U2', $data->masa_pajak);
+        $sheet->setCellValue('V2', $data->tahun_pajak);
+        $sheet->setCellValue('W2', $data->status);
         $sheet->setCellValue('X2', $data->no_produk_hukum);
         $sheet->setCellValue('Y2', date("d-m-Y", strtotime($data->tgl_produk_hukum)));
-        $sheet->setCellValue('Z2', $data->jml_byr_semula);
-        $sheet->setCellValue('AA2', $data->tambah);
-        $sheet->setCellValue('AB2', $data->kurang);
-        $sheet->setCellValue('AC2', $data->jml_byr_produk);
-        $sheet->setCellValue('AD2', $data->hasil_keputusan);
-        $sheet->setCellValue('AE2', $data->no_resi);
-        $sheet->setCellValue('AF2', date("d-m-Y", strtotime($data->tgl_resi)));
-        $sheet->setCellValue('AG2', $data->no_srt_pengantar);
-        $sheet->setCellValue('AH2', date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
-        $sheet->setCellValue('AI2', $data->status);
-        $sheet->setCellValue('AJ2', $data->progress);
-        $sheet->setCellValue('AK2', $data->jumlah_byr_pmk);
-        $sheet->setCellValue('AL2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+        $sheet->setCellValue('Z2', $data->kurang);
+        $sheet->setCellValue('AA2', $data->hasil_keputusan);
+        $sheet->setCellValue('AB2', $data->jumlah_byr_pmk);
+        $sheet->setCellValue('AC2', date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+        $sheet->setCellValue('AD2', $data->progress);
+        $sheet->setCellValue('AE2', $data->jml_byr_semula);
+        $sheet->setCellValue('AF2', $data->jml_byr_produk);
+        $sheet->setCellValue('AG2', $data->kepala_seksi);
+        $sheet->setCellValue('AH2', $data->tambah);
+        $sheet->setCellValue('AI2', $data->no_resi);
+        $sheet->setCellValue('AJ2', date("d-m-Y", strtotime($data->tgl_resi)));
+        $sheet->setCellValue('AK2', $data->no_srt_pengantar);
+        $sheet->setCellValue('AL2', date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
 
         $header_style_border = [
             'borders' => [
@@ -669,39 +683,39 @@ class KasiController extends Controller
         $sheet->setCellValue('C1', 'Nomor Naskah Dinas');
         $sheet->setCellValue('D1', 'Tanggal Naskah Dinas');
         $sheet->setCellValue('E1', 'Asal Permohonan');
-        $sheet->setCellValue('F1', 'Nomor Lembar Pengawasan Arus Dokumen');
-        $sheet->setCellValue('G1', 'Tanggal diterima KPP');
-        $sheet->setCellValue('H1', 'Tanggal diterima Kanwil');
-        $sheet->setCellValue('I1', 'Nomor Pokok Wajib Pajak');
-        $sheet->setCellValue('J1', 'Nama Wajib Pajak');
-        $sheet->setCellValue('K1', 'Jenis Permohonan');
-        $sheet->setCellValue('L1', 'Jenis Pajak');
-        $sheet->setCellValue('M1', 'Jenis Ketetapan');
-        $sheet->setCellValue('N1', 'Nomor Ketetapan');
-        $sheet->setCellValue('O1', 'Tanggal Ketetapan');
-        $sheet->setCellValue('P1', 'Masa Pajak');
-        $sheet->setCellValue('Q1', 'Tahun Pajak');
-        $sheet->setCellValue('R1', 'Kategori Permohonan');
-        $sheet->setCellValue('S1', 'Nomor Surat Permohonan');
-        $sheet->setCellValue('T1', 'Tanggal Surat Permohonan');
-        $sheet->setCellValue('U1', 'Seksi Konseptor');
-        $sheet->setCellValue('V1', 'Kepala Seksi');
-        $sheet->setCellValue('W1', 'PK Konseptor');
+        $sheet->setCellValue('F1', 'Nama Wajib Pajak');
+        $sheet->setCellValue('G1', 'Nomor Pokok Wajib Pajak');
+        $sheet->setCellValue('H1', 'Jenis Permohonan');
+        $sheet->setCellValue('I1', 'Kategori Permohonan');
+        $sheet->setCellValue('J1', 'Tanggal diterima KPP');
+        $sheet->setCellValue('K1', 'Nomor Lembar Pengawasan Arus Dokumen');
+        $sheet->setCellValue('L1', 'Tanggal diterima Kanwil');
+        $sheet->setCellValue('M1', 'Seksi Konseptor');
+        $sheet->setCellValue('N1', 'PK Konseptor');
+        $sheet->setCellValue('O1', 'Nomor Surat Permohonan');
+        $sheet->setCellValue('P1', 'Tanggal Surat Permohonan');
+        $sheet->setCellValue('Q1', 'Jenis Ketetapan');
+        $sheet->setCellValue('R1', 'Jenis Pajak');
+        $sheet->setCellValue('S1', 'Nomor Ketetapan');
+        $sheet->setCellValue('T1', 'Tanggal Ketetapan');
+        $sheet->setCellValue('U1', 'Masa Pajak');
+        $sheet->setCellValue('V1', 'Tahun Pajak');
+        $sheet->setCellValue('W1', 'Status');
         $sheet->setCellValue('X1', 'Nomor Produk Hukum');
         $sheet->setCellValue('Y1', 'Tanggal Produk Hukum');
-        $sheet->setCellValue('Z1', 'Jumlah yang Masih Harus Dibayar Semula');
-        $sheet->setCellValue('AA1', 'Tambah');
-        $sheet->setCellValue('AB1', 'Kurang');
-        $sheet->setCellValue('AC1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
-        $sheet->setCellValue('AD1', 'Hasil Keputusan');
-        $sheet->setCellValue('AE1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AF1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
-        $sheet->setCellValue('AG1', 'Nomor Surat Pengantar');
-        $sheet->setCellValue('AH1', 'Tanggal Surat Pengantar');
-        $sheet->setCellValue('AI1', 'Status');
-        $sheet->setCellValue('AJ1', 'Progress');
-        $sheet->setCellValue('AK1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
-        $sheet->setCellValue('AL1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('Z1', 'Kurang');
+        $sheet->setCellValue('AA1', 'Hasil Keputusan Tambah');
+        $sheet->setCellValue('AB1', 'Jumlah Pembayaran a/ PMK-29 & PMK-91');
+        $sheet->setCellValue('AC1', 'Tanggal Pembayaran');
+        $sheet->setCellValue('AD1', 'Progress');
+        $sheet->setCellValue('AE1', 'Jumlah yang Masih Harus Dibayar Semula');
+        $sheet->setCellValue('AF1', 'Jumlah yang Masih Harus sesuai Produk Hukum');
+        $sheet->setCellValue('AG1', 'Kepala Seksi');
+        $sheet->setCellValue('AH1', 'Tambah');
+        $sheet->setCellValue('AI1', 'Nomor Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AJ1', 'Tanggal Bukti Terima Kiriman (Resi) Pos');
+        $sheet->setCellValue('AK1', 'Nomor Surat Pengantar');
+        $sheet->setCellValue('AL1', 'Tanggal Surat Pengantar');
 
         $spreadsheet->getActiveSheet()->getStyle('A1:AL1')->getFont()->getColor()->setARGB('FFFFFFFF');
         $sheet->getStyle('A1:AL1')->applyFromArray($fontTitle);
@@ -714,39 +728,39 @@ class KasiController extends Controller
             $sheet->setCellValue('C' . $last_row, $data->no_naskah_dinas);
             $sheet->setCellValue('D' . $last_row, date("d-m-Y", strtotime($data->tgl_naskah_dinas)));
             $sheet->setCellValue('E' . $last_row, $data->pemohon);
-            $sheet->setCellValue('F' . $last_row, $data->no_lbr_pengawas_dok);
-            $sheet->setCellValue('G' . $last_row, date("d-m-Y", strtotime($data->tgl_diterima_kpp)));
-            $sheet->setCellValue('H' . $last_row, date("d-m-Y", strtotime($data->tgl_diterima_kanwil)));
-            $sheet->setCellValue('I' . $last_row, $data->npwp);
-            $sheet->setCellValue('J' . $last_row, $data->nama_wajib_pajak);
-            $sheet->setCellValue('K' . $last_row, $data->jenis_permohonan);
-            $sheet->setCellValue('L' . $last_row, $data->pajak);
-            $sheet->setCellValue('M' . $last_row, $data->jenis_ketetapan);
-            $sheet->setCellValue('N' . $last_row, $data->no_ketetapan);
-            $sheet->setCellValue('O' . $last_row, date("d-m-Y", strtotime($data->tgl_ketetapan)));
-            $sheet->setCellValue('P' . $last_row, $data->masa_pajak);
-            $sheet->setCellValue('Q' . $last_row, $data->tahun_pajak);
-            $sheet->setCellValue('R' . $last_row, $data->kat_permohonan);
-            $sheet->setCellValue('S' . $last_row, $data->no_srt_permohonan);
-            $sheet->setCellValue('T' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
-            $sheet->setCellValue('U' . $last_row, $data->seksi_konseptor);
-            $sheet->setCellValue('V' . $last_row, $data->kepala_seksi);
-            $sheet->setCellValue('W' . $last_row, $data->pk_konseptor);
+            $sheet->setCellValue('F' . $last_row, $data->nama_wajib_pajak);
+            $sheet->setCellValue('G' . $last_row, $data->npwp);
+            $sheet->setCellValue('H' . $last_row, $data->jenis_permohonan);
+            $sheet->setCellValue('I' . $last_row, $data->kat_permohonan);
+            $sheet->setCellValue('J' . $last_row, date("d-m-Y", strtotime($data->tgl_diterima_kpp)));
+            $sheet->setCellValue('K' . $last_row, $data->no_lbr_pengawas_dok);
+            $sheet->setCellValue('L' . $last_row, date("d-m-Y", strtotime($data->tgl_diterima_kanwil)));
+            $sheet->setCellValue('M' . $last_row, $data->seksi_konseptor);
+            $sheet->setCellValue('N' . $last_row, $data->pk_konseptor);
+            $sheet->setCellValue('O' . $last_row, $data->no_srt_permohonan);
+            $sheet->setCellValue('P' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_permohonan)));
+            $sheet->setCellValue('Q' . $last_row, $data->jenis_ketetapan);
+            $sheet->setCellValue('R' . $last_row, $data->pajak);
+            $sheet->setCellValue('S' . $last_row, $data->no_ketetapan);
+            $sheet->setCellValue('T' . $last_row, date("d-m-Y", strtotime($data->tgl_ketetapan)));
+            $sheet->setCellValue('U' . $last_row, $data->masa_pajak);
+            $sheet->setCellValue('V' . $last_row, $data->tahun_pajak);
+            $sheet->setCellValue('W' . $last_row, $data->status);
             $sheet->setCellValue('X' . $last_row, $data->no_produk_hukum);
             $sheet->setCellValue('Y' . $last_row, date("d-m-Y", strtotime($data->tgl_produk_hukum)));
-            $sheet->setCellValue('Z' . $last_row, $data->jml_byr_semula);
-            $sheet->setCellValue('AA' . $last_row, $data->tambah);
-            $sheet->setCellValue('AB' . $last_row, $data->kurang);
-            $sheet->setCellValue('AC' . $last_row, $data->jml_byr_produk);
-            $sheet->setCellValue('AD' . $last_row, $data->hasil_keputusan);
-            $sheet->setCellValue('AE' . $last_row, $data->no_resi);
-            $sheet->setCellValue('AF' . $last_row, date("d-m-Y", strtotime($data->tgl_resi)));
-            $sheet->setCellValue('AG' . $last_row, $data->no_srt_pengantar);
-            $sheet->setCellValue('AH' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
-            $sheet->setCellValue('AI' . $last_row, $data->status);
-            $sheet->setCellValue('AJ' . $last_row, $data->progress);
-            $sheet->setCellValue('AK' . $last_row, $data->jumlah_byr_pmk);
-            $sheet->setCellValue('AL' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+            $sheet->setCellValue('Z' . $last_row, $data->kurang);
+            $sheet->setCellValue('AA' . $last_row, $data->hasil_keputusan);
+            $sheet->setCellValue('AB' . $last_row, $data->jumlah_byr_pmk);
+            $sheet->setCellValue('AC' . $last_row, date("d-m-Y", strtotime($data->tgl_byr_pmk)));
+            $sheet->setCellValue('AD' . $last_row, $data->progress);
+            $sheet->setCellValue('AE' . $last_row, $data->jml_byr_semula);
+            $sheet->setCellValue('AF' . $last_row, $data->jml_byr_produk);
+            $sheet->setCellValue('AG' . $last_row, $data->kepala_seksi);
+            $sheet->setCellValue('AH' . $last_row, $data->tambah);
+            $sheet->setCellValue('AI' . $last_row, $data->no_resi);
+            $sheet->setCellValue('AJ' . $last_row, date("d-m-Y", strtotime($data->tgl_resi)));
+            $sheet->setCellValue('AK' . $last_row, $data->no_srt_pengantar);
+            $sheet->setCellValue('AL' . $last_row, date("d-m-Y", strtotime($data->tgl_srt_pengantar)));
         }
 
         $header_style_border = [

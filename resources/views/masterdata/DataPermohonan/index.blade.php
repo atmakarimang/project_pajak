@@ -264,18 +264,21 @@
         }); 
     }
     function buttonDeletePmh(data){
-        window.location.href = data.getAttribute('data-link');
-        // swal({   
-        //     title: "Are you sure?",   
-        //     text: "You will not be able to recover this data!",   
-        //     type: "warning",   
-        //     showCancelButton: true,   
-        //     confirmButtonColor: "#DD6B55",   
-        //     confirmButtonText: "Yes",   
-        //     closeOnConfirm: true 
-        // }, function(){
-        //     // window.location.href = data.getAttribute('data-link');
-        // });
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda tidak akan dapat mengembalikan data!",
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus',
+            cancelButtonColor: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = data.getAttribute('data-link');
+            }
+        });
     }
     $('#table-jp').DataTable({
         "destroy" : true,
@@ -314,7 +317,21 @@
         }); 
     }
     function buttonDeleteJP(data){
-        window.location.href = data.getAttribute('data-link');
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda tidak akan dapat mengembalikan data!",
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus',
+            cancelButtonColor: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = data.getAttribute('data-link');
+            }
+        });
     }
     $('#table-kp').DataTable({
         "destroy" : true,
@@ -353,6 +370,20 @@
         }); 
     }
     function buttonDeleteKP(data){
-        window.location.href = data.getAttribute('data-link');
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda tidak akan dapat mengembalikan data!",
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus',
+            cancelButtonColor: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = data.getAttribute('data-link');
+            }
+        });
     }
 </script>

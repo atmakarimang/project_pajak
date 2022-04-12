@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // baru
 use App\Models\User;
 use App\Models\JenisPermohonan;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class DashboardController extends Controller
 {

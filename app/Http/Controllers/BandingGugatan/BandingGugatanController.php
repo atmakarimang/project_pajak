@@ -168,6 +168,8 @@ class BandingGugatanController extends Controller
 
         $data["flashs"] = $flashs;
         // return redirect()->back()->with($data);
+        toast($flashs[0]['message'], $flashs[0]['type']);
+
         return redirect()->route('bandinggugatan.index');
     }
     public function browse(Request $request)
@@ -268,6 +270,9 @@ class BandingGugatanController extends Controller
         $id_bg = base64_decode($id_bg);
         BandingGugatanChild::where('id_bg', $id_bg)->delete();
         BandingGugatan::where('id_bg', $id_bg)->delete();
+
+        toast('Data sudah berhasil dihapus', 'success');
+
         return redirect()->back();
     }
 
