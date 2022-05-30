@@ -46,15 +46,173 @@ class KasiController extends Controller
     public function index(Request $request)
     {
         // Session::flash('backUrl', Request::fullUrl());
+        // -- Start Search
+        $id_session = "schkey:" . $request->session()->getId();
+        $chck_redirect1 = "KasiRedirect:" . $request->session()->getId();
+        $chck_redirect2 = $request->session()->get($chck_redirect1);
+
+        //check refresh atau reload
+        $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
+
+        if ($pageWasRefreshed) {
+            if ($chck_redirect2 == 'Ya') {
+                $search_key = $request->session()->get($id_session);
+            } else {
+                $search_key = '';
+            }
+        } else {
+            $request->session()->forget($id_session);
+            $request->session()->forget($chck_redirect1);
+            $search_key = '';
+        }
+
         $data = [];
         $user = Auth::user();
         $mode = $request->mode;
         $data["mode"] = $mode;
         $data['user'] = $user;
         $data['active'] = 'Eksekutor';
+        $data['search'] = $search_key;
 
-        return view($this->PATH_VIEW . 'index', $data);
+        //return view($this->PATH_VIEW . 'index', $data);
+        return view($this->PATH_VIEW . 'index', ["data" => $data]);
     }
+
+    public function searchKS(Request $request)
+    {
+        $user = User::where('user_id', session('user_id'))->first();
+        $start = $request->input('start');
+        $length = $request->input('length');
+        $draw = $request->input('draw');
+        $search_arr = $request->input('search');
+
+        //search
+        $id_session = "schkey:" . $request->session()->getId();
+        $search = $request->searchks;
+
+        $start = ($request->input('start') ? $request->input('start') : 0);
+        $length = ($request->input('length') ? $request->input('length') : 10);
+        $order_arr = $request->input('order');
+        $order_arr = $order_arr[0];
+        $orderByColumnIndex = $order_arr['column']; // index of the sorting column (0 index based - i.e. 0 is the first record)
+        $orderType = $order_arr['dir']; // ASC or DESC
+        $orderBy = $request->input('columns');
+        $orderBy = $orderBy[$orderByColumnIndex]['name']; //Get name of the sorting column from its index
+        $limit = $length;
+        $offset = $start;
+
+        $jumlahTotal = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+            ->orWhereNull('status_dokumen')
+            ->count();
+
+        $request->session()->put($id_session, $search);
+
+        if ($search) { // filter data
+            $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
+            OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
+            OR no_ketetapan like lower('%{$search}%') OR no_produk_hukum like lower('%{$search}%') 
+            OR tgl_produk_hukum like lower('%{$search}%') OR pk_konseptor like lower('%{$search}%')
+            OR hasil_keputusan like lower('%{$search}%') OR status like lower('%{$search}%')";
+            $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
+            if ($orderBy != null) {
+                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
+                    ->whereRaw($where)->orderBy($orderBy, $orderType)->get();
+            } else {
+                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
+                    ->whereRaw($where)->get();
+            }
+        } else {
+            $jumlahFiltered = $jumlahTotal;
+            if ($orderBy != null) {
+                $data = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+                    ->orWhereNull('status_dokumen')
+                    ->offset($offset)
+                    ->limit($limit)->orderBy($orderBy, $orderType)->get();
+            } else {
+                $data = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+                    ->orWhereNull('status_dokumen')
+                    ->offset($offset)
+                    ->limit($limit)->get();
+            }
+        }
+        $result = [];
+        foreach ($data as $no => $dt) {
+            $linkedit = url('/permohonan/kasi/create', base64_encode($dt->no_agenda));
+
+            $action = '<center>
+                            <a href="' . $linkedit . '">
+                                <button data-toggle="tooltip" title="Kasi" type="button" class="btn btn-xs btn-primary btn-circle"><i class="fas fa-sign-in-alt"></i></button>
+                            </a>
+                            </center>';
+
+
+            if ($dt->progress == 'Final') {
+                $badge = 'badge-success';
+            } else if ($dt->progress == 'Proses') {
+                $badge = 'badge-primary';
+            } else {
+                $badge = 'badge-info';
+            }
+            $progress = '<center>
+                            <span class="badge ' . $badge . '">' . $dt->progress . '</span>
+                        </center>';
+
+            if ($dt->status == 'Selesai') {
+                $badge = 'badge-success';
+            } else if ($dt->status == 'Tunggakan') {
+                $badge = 'badge-danger';
+            } else if ($dt->status == 'Kembali') {
+                $badge = 'badge-warning';
+            } else {
+                $badge = 'badge-info';
+            }
+            $status = '<center>
+                            <span class="badge ' . $badge . '">' . $dt->status . '</span>
+                        </center>';
+
+            if ($dt->hasil_keputusan == 'Diterima') {
+                $badge = 'badge-success';
+            } else if ($dt->hasil_keputusan == 'Ditolak') {
+                $badge = 'badge-danger';
+            } else if ($dt->hasil_keputusan == 'Dicabut') {
+                $badge = 'badge-warning';
+            } else if ($dt->hasil_keputusan == 'Tolak Formal') {
+                $badge = 'badge-dark';
+            } else if ($dt->hasil_keputusan == 'Sebagian') {
+                $badge = 'badge-secondary';
+            } else {
+                $badge = 'badge-info';
+            }
+
+            $hasil_kep = '<center>
+                            <span class="badge ' . $badge . '">' . $dt->hasil_keputusan . '</span>
+                        </center>';
+
+            $result[] = [
+                $start + $no + 1,
+                $dt->no_agenda,
+                $dt->npwp,
+                $dt->nama_wajib_pajak,
+                $dt->jenis_permohonan,
+                $dt->no_ketetapan,
+                $dt->pk_konseptor,
+                $dt->no_produk_hukum,
+                $dt->tgl_produk_hukum,
+                $status,
+                $hasil_kep,
+                $action,
+            ];
+        }
+        echo json_encode(
+            array(
+                'draw' => $draw,
+                'recordsTotal' => $jumlahTotal,
+                'recordsFiltered' => $jumlahFiltered,
+                'data' => $result,
+            )
+        );
+    }
+
     public function datatableKasi(Request $request)
     {
         // Session::flash('backUrl', Request::fullUrl());
@@ -230,6 +388,8 @@ class KasiController extends Controller
         $error = 0;
         DB::beginTransaction();
 
+        $id_session = "KasiRedirect:" . $request->session()->getId();
+
         if ($mode == "edit") {
             $no_agenda = $request->no_agenda;
             $pb   = PelaksanaBidang::where('no_agenda', $no_agenda)->first();
@@ -296,9 +456,8 @@ class KasiController extends Controller
         }
 
         $data["flashs"] = $flashs;
-
         toast($flashs[0]['message'], $flashs[0]['type']);
-
+        $request->session()->put($id_session, 'Ya');
         return redirect()->route('kasi.index');
         // if (Session::has('backUrl')) {
         //     Session::keep('backUrl');
@@ -320,14 +479,14 @@ class KasiController extends Controller
         $keberatan = stripos($data->jenis_permohonan, 'keberatan');
         //MR != keberatan 3bln, = keberatan 8bln
         $tgl_diterima_kpp = date('d-m-Y', strtotime($data->tgl_diterima_kpp));
-        $d_mr = strtotime("+3 months", strtotime($data->tgl_diterima_kpp));
-        $d_mrk = strtotime("+8 months", strtotime($data->tgl_diterima_kpp));
+        $d_mr = strtotime("+3 months,-1 day", strtotime($data->tgl_diterima_kpp));
+        $d_mrk = strtotime("+8 months,-1 day", strtotime($data->tgl_diterima_kpp));
         //IKU != keberatan 5bln, = keberatan 10bln
-        $d_iku = strtotime("+5 months", strtotime($data->tgl_diterima_kpp));
-        $d_ikuk = strtotime("+10 months", strtotime($data->tgl_diterima_kpp));
+        $d_iku = strtotime("+5 months,-1 day", strtotime($data->tgl_diterima_kpp));
+        $d_ikuk = strtotime("+10 months,-1 day", strtotime($data->tgl_diterima_kpp));
         //KUP != keberatan 6bln, = keberatan 12bln
-        $d_kup = strtotime("+6 months", strtotime($data->tgl_diterima_kpp));
-        $d_kupk = strtotime("+12 months", strtotime($data->tgl_diterima_kpp));
+        $d_kup = strtotime("+6 months,-1 day", strtotime($data->tgl_diterima_kpp));
+        $d_kupk = strtotime("+12 months,-1 day", strtotime($data->tgl_diterima_kpp));
         if ($keberatan != "") { // == keberatan
             $jt_mr = date("d-m-Y", $d_mrk);
             $jt_iku = date("d-m-Y", $d_ikuk);
@@ -623,14 +782,31 @@ class KasiController extends Controller
         $writer->save("php://output");
         header('Content-Disposition: attachment; filename="Eksekutor ' . $noagen . '.xls');
     }
-    public function printAll()
+    public function printAll(Request $request)
     {
-        $dataAll = PelaksanaBidang::get();
-        if (!$dataAll) {
-            // $msg = notifErrorHelper('Wrong Action','Error');
-            // return redirect()->back()->with('flashs',$msg);
-            return redirect()->back();
+        $search = $request->searchks;
+        if ($search != null) {
+            $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
+            OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
+            OR no_ketetapan like lower('%{$search}%') OR no_produk_hukum like lower('%{$search}%') 
+            OR tgl_produk_hukum like lower('%{$search}%') OR pk_konseptor like lower('%{$search}%')
+            OR hasil_keputusan like lower('%{$search}%') OR status like lower('%{$search}%')";
+            $dataAll = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+                ->orWhereNull('status_dokumen')
+                ->whereRaw("{$where}")
+                ->get();
+            if (!$dataAll) {
+                return redirect()->back();
+            }
+        } else {
+            $dataAll = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
+                ->orWhereNull('status_dokumen')
+                ->get();
+            if (!$dataAll) {
+                return redirect()->back();
+            }
         }
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->getPageSetup()->setFitToWidth(1);

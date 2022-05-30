@@ -1,8 +1,7 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
-  <!-- {{route('dashboard')}} -->
-  <a href="" class="brand-link">
+  <a href="{{route('dashboard')}}" class="brand-link">
     <img src="{{asset('assets/img/LogoKWputih148px.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
       style="opacity: .8">
     <span class="brand-text font-weight-light">A.K.B.P</span>

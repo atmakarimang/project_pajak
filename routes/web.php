@@ -119,6 +119,7 @@ Route::get('/master-data/deleteEks/{id}', 'App\Http\Controllers\MasterData\Petug
 Route::get('/permohonan/pelaksana-bidang', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@index')->name('pelaksanabidang.index')->middleware('checkLogin');
 Route::post('pelaksana-bidang/store', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@store')->name('pelaksanabidang.store')->middleware('checkLogin');
 Route::get('/permohonan/pelaksana-bidang/browse', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@browse')->name('pelaksanabidang.browse')->middleware('checkLogin');
+Route::get('/permohonan/pelaksana-bidang/searchPB', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@searchPB')->name('pelaksanabidang.searchPB')->middleware('checkLogin');
 Route::get('/permohonan/pelaksana-bidang/datatablePB', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@datatablePB')->name('pelaksanabidang.datatablePB')->middleware('checkLogin');
 Route::get('/permohonan/pelaksana-bidang/delete/{no_agenda}', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@delete')->middleware('checkLogin');
 Route::get('/permohonan/pelaksana-bidang/print/{id}', 'App\Http\Controllers\Permohonan\PelaksanaBidangController@print')->name('pelaksanabidang.print')->middleware('checkLogin');
@@ -126,6 +127,7 @@ Route::get('/permohonan/pelaksana-bidang/printAll', 'App\Http\Controllers\Permoh
 
 Route::get('/permohonan/kasi', 'App\Http\Controllers\Permohonan\KasiController@index')->name('kasi.index')->middleware('checkLogin');
 Route::get('/permohonan/kasi/datatableKasi', 'App\Http\Controllers\Permohonan\KasiController@datatableKasi')->name('kasi.datatableKasi')->middleware('checkLogin');
+Route::get('/permohonan/kasi/searchKS', 'App\Http\Controllers\Permohonan\KasiController@searchKS')->name('kasi.searchKS')->middleware('checkLogin');
 Route::get('/permohonan/kasi/create/{no_agenda}', 'App\Http\Controllers\Permohonan\KasiController@create')->name('kasi.create')->middleware('checkLogin');
 Route::post('/permohonan/kasi/store', 'App\Http\Controllers\Permohonan\KasiController@store')->name('kasi.store')->middleware('checkLogin');
 Route::get('/permohonan/kasi/printLabel/{id}/{doctype}', 'App\Http\Controllers\Permohonan\KasiController@printLabel')->name('kasi.printLabel')->middleware('checkLogin');
