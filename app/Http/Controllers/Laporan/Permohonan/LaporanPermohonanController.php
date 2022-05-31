@@ -74,10 +74,11 @@ class LaporanPermohonanController extends Controller
         $seksi_konseptor = $request->seksi_konseptor;
         $pk_konseptor = $request->pk_konseptor;
         $jatuh_tempo = $request->jatuh_tempo;
-        $tgl_awal = $request->tgl_awal;
-        $tgl_akhir = $request->tgl_akhir;
+        $date_awl = str_replace('/', '-', $request->tgl_awal);
+        $tgl_awal = date("Y-m-d", strtotime($date_awl));
+        $date_akhir = str_replace('/', '-', $request->tgl_akhir);
+        $tgl_akhir = date("Y-m-d", strtotime($date_akhir));
         $status = $request->status;
-
         // dd($jenis_pmh,$seksi_konseptor,$pk_konseptor,$jatuh_tempo,$status);
         $jpm = '';
         if ($jenis_pmh != '-') {
@@ -89,47 +90,76 @@ class LaporanPermohonanController extends Controller
         }
         $pk = '';
         if ($pk_konseptor != '-') {
-            $pk = "AND PK_KONSEPTOR = '" . $pk_konseptor . "'";
+            $pk = "AND PK_KONSEPTOR LIKE '%" . $pk_konseptor . "%'";
         }
         $stts = '';
         if ($status != '-') {
             $stts = "AND STATUS = '" . $status . "'";
         }
+
         $filter = $jpm . " " . $sk . " " . $pk . " " . $stts;
-        // dd($filter);
-        $jumlahTotal = PelaksanaBidang::where('status_dokumen', '<>', 'Delete')
-            ->orWhereNull('status_dokumen')
-            ->count();
+
+        $whereraw = '(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '';
+        if ($jatuh_tempo == 'MR') {
+            $whereraw .= " HAVING (MR BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (MRK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        } else if ($jatuh_tempo == 'IKU') {
+            $whereraw .= " HAVING (IKU BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (IKUK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        } else if ($jatuh_tempo == 'KUP') {
+            $whereraw .= " HAVING (KUP BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (KUPK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        }
+        $jumlahT = PelaksanaBidang::whereRaw($whereraw)
+            ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                    ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                    ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                    ) - INTERVAL 1 DAY AS KUPK')
+            ->get();
+        $jumlahTotal = count($jumlahT);
 
         if ($search) { // filter data
             $where = " no_agenda like lower('%{$search}%') OR npwp like lower('%{$search}%')
             OR nama_wajib_pajak like lower('%{$search}%') OR jenis_permohonan like lower('%{$search}%')
             OR pajak like lower('%{$search}%') OR no_ketetapan like lower('%{$search}%')
             OR seksi_konseptor like lower('%{$search}%') OR progress like lower('%{$search}%') OR status like lower('%{$search}%')";
-            $jumlahFiltered = PelaksanaBidang::whereRaw("{$where}")->count(); //hitung data yang telah terfilter
+            $jumlahFiltered = PelaksanaBidang::whereRaw($whereraw)->whereRaw("{$where}")->count(); //hitung data yang telah terfilter
             if ($orderBy != null) {
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
-                    ->whereRaw($where)->orderBy($orderBy, $orderType)->get();
+                // $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
+                $data = PelaksanaBidang::whereRaw($whereraw)->whereRaw($where)
+                    ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                    ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                    ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                    ) - INTERVAL 1 DAY AS KUPK')
+                    ->orderBy($orderBy, $orderType)->get();
             } else {
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL)')
-                    ->whereRaw($where)->get();
+                $data = PelaksanaBidang::whereRaw($whereraw)->whereRaw($where)
+                    ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                    ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                    ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                    ) - INTERVAL 1 DAY AS KUPK')
+                    ->get();
+                // dd($data);
             }
         } else {
             $jumlahFiltered = $jumlahTotal;
+
             if ($orderBy != null) {
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')
+                // $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')
+                $data = PelaksanaBidang::whereRaw($whereraw)
+                    ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                    ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                    ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                    ) - INTERVAL 1 DAY AS KUPK')
                     ->offset($offset)
                     ->limit($limit)->orderBy($orderBy, $orderType)->get();
             } else {
-                $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')
+                // $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')
+                $data = PelaksanaBidang::whereRaw($whereraw)
+                    ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                    ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                    ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                    ) - INTERVAL 1 DAY AS KUPK')
                     ->offset($offset)
                     ->limit($limit)
                     ->get();
-
-                // $data = PelaksanaBidang::where('status_dokumen','<>','Delete')
-                //     ->orWhereNull('status_dokumen')
-                //     ->offset($offset)
-                //     ->limit($limit)->get();
             }
         }
         $result = [];
@@ -137,24 +167,32 @@ class LaporanPermohonanController extends Controller
             $keberatan = stripos($dt->jenis_permohonan, 'keberatan');
             //MR != keberatan 3bln, = keberatan 8bln
             $tgl_diterima_kpp = date('d-m-Y', strtotime($dt->tgl_diterima_kpp));
-            $d_mr = strtotime("+3 months", strtotime($dt->tgl_diterima_kpp));
-            $d_mrk = strtotime("+8 months", strtotime($dt->tgl_diterima_kpp));
-            //IKU != keberatan 5bln, = keberatan 10bln
-            $d_iku = strtotime("+5 months", strtotime($dt->tgl_diterima_kpp));
-            $d_ikuk = strtotime("+10 months", strtotime($dt->tgl_diterima_kpp));
-            //KUP != keberatan 6bln, = keberatan 12bln
-            $d_kup = strtotime("+6 months", strtotime($dt->tgl_diterima_kpp));
-            $d_kupk = strtotime("+12 months", strtotime($dt->tgl_diterima_kpp));
+            // $d_mr = strtotime("+3 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // $d_mrk = strtotime("+8 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // //IKU != keberatan 5bln, = keberatan 10bln
+            // $d_iku = strtotime("+5 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // $d_ikuk = strtotime("+10 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // //KUP != keberatan 6bln, = keberatan 12bln
+            // $d_kup = strtotime("+6 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // $d_kupk = strtotime("+12 months,-1 day",strtotime($dt->tgl_diterima_kpp));
+            // if ($keberatan != "") { // == keberatan
+            //     $jt_mr = date("d-m-Y",$d_mrk);
+            //     $jt_iku = date("d-m-Y",$d_ikuk);
+            //     $jt_kup = date("d-m-Y",$d_kupk);
+            // } else { // !=keberatan
+            //     $jt_mr = date("d-m-Y",$d_mr);
+            //     $jt_iku = date("d-m-Y",$d_iku);
+            //     $jt_kup = date("d-m-Y",$d_kup);
+            // }
             if ($keberatan != "") { // == keberatan
-                $jt_mr = date("d-m-Y", $d_mrk);
-                $jt_iku = date("d-m-Y", $d_ikuk);
-                $jt_kup = date("d-m-Y", $d_kupk);
+                $jt_mr = date("d-m-Y", strtotime($dt->MRK));
+                $jt_iku = date("d-m-Y", strtotime($dt->IKUK));
+                $jt_kup = date("d-m-Y", strtotime($dt->KUPK));
             } else { // !=keberatan
-                $jt_mr = date("d-m-Y", $d_mr);
-                $jt_iku = date("d-m-Y", $d_iku);
-                $jt_kup = date("d-m-Y", $d_kup);
+                $jt_mr = date("d-m-Y", strtotime($dt->MR));
+                $jt_iku = date("d-m-Y", strtotime($dt->IKU));
+                $jt_kup = date("d-m-Y", strtotime($dt->KUP));
             }
-
             if ($dt->status == 'Selesai') {
                 $badge = 'badge-success';
             } else if ($dt->status == 'Tunggakan') {
@@ -209,8 +247,10 @@ class LaporanPermohonanController extends Controller
         $seksi_konseptor = $request->seksi_konseptor;
         $pk_konseptor = $request->pk_konseptor;
         $jatuh_tempo = $request->jatuh_tempo;
-        $tgl_awal = $request->tgl_awal;
-        $tgl_akhir = $request->tgl_akhir;
+        $date_awl = str_replace('/', '-', $request->tgl_awal);
+        $tgl_awal = date("Y-m-d", strtotime($date_awl));
+        $date_akhir = str_replace('/', '-', $request->tgl_akhir);
+        $tgl_akhir = date("Y-m-d", strtotime($date_akhir));
         $status = $request->status;
 
         // dd($jenis_pmh,$seksi_konseptor,$pk_konseptor,$jatuh_tempo,$status);
@@ -224,7 +264,7 @@ class LaporanPermohonanController extends Controller
         }
         $pk = '';
         if ($pk_konseptor != '-') {
-            $pk = "AND PK_KONSEPTOR = '" . $pk_konseptor . "'";
+            $pk = "AND PK_KONSEPTOR LIKE '%" . $pk_konseptor . "%'";
         }
         $stts = '';
         if ($status != '-') {
@@ -232,7 +272,21 @@ class LaporanPermohonanController extends Controller
         }
         $filter = $jpm . " " . $sk . " " . $pk . " " . $stts;
 
-        $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '')->get();
+        $whereraw = '(status_dokumen <> "Delete" OR status_dokumen IS NULL) ' . $filter . '';
+        if ($jatuh_tempo == 'MR') {
+            $whereraw .= " HAVING (MR BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (MRK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        } else if ($jatuh_tempo == 'IKU') {
+            $whereraw .= " HAVING (IKU BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (IKUK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        } else if ($jatuh_tempo == 'KUP') {
+            $whereraw .= " HAVING (KUP BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "') OR (KUPK BETWEEN '" . $tgl_awal . "' AND '" . $tgl_akhir . "')";
+        }
+        // $data = PelaksanaBidang::whereRaw('(status_dokumen <> "Delete" OR status_dokumen IS NULL) '.$filter.'')->get();
+        $data = PelaksanaBidang::whereRaw($whereraw)
+            ->selectRaw('*,DATE_ADD(tgl_diterima_kpp,INTERVAL 3 MONTH) - INTERVAL 1 DAY AS MR,DATE_ADD(tgl_diterima_kpp,INTERVAL 8 MONTH
+                ) - INTERVAL 1 DAY AS MRK,DATE_ADD(tgl_diterima_kpp,INTERVAL 5 MONTH) - INTERVAL 1 DAY AS IKU,DATE_ADD(tgl_diterima_kpp,INTERVAL 10 MONTH
+                ) - INTERVAL 1 DAY AS IKUK,DATE_ADD(tgl_diterima_kpp,INTERVAL 6 MONTH) - INTERVAL 1 DAY AS KUP,DATE_ADD(tgl_diterima_kpp,INTERVAL 12 MONTH
+                ) - INTERVAL 1 DAY AS KUPK')
+            ->get();
         // dd($data);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -291,8 +345,8 @@ class LaporanPermohonanController extends Controller
         $sheet->setCellValue('J6', 'Status');
         $sheet->setCellValue('K6', 'Jatuh Tempo');
         $sheet->setCellValue('K7', 'MR');
-        $sheet->setCellValue('L7', 'KUP');
-        $sheet->setCellValue('M7', 'IKU');
+        $sheet->setCellValue('L7', 'IKU');
+        $sheet->setCellValue('M7', 'KUP');
 
         $sheet->mergeCells("K6:M6");
         $table_hr = [
@@ -319,22 +373,14 @@ class LaporanPermohonanController extends Controller
             $keberatan = stripos($dt->jenis_permohonan, 'keberatan');
             //MR != keberatan 3bln, = keberatan 8bln
             $tgl_diterima_kpp = date('d-m-Y', strtotime($dt->tgl_diterima_kpp));
-            $d_mr = strtotime("+3 months", strtotime($dt->tgl_diterima_kpp));
-            $d_mrk = strtotime("+8 months", strtotime($dt->tgl_diterima_kpp));
-            //IKU != keberatan 5bln, = keberatan 10bln
-            $d_iku = strtotime("+5 months", strtotime($dt->tgl_diterima_kpp));
-            $d_ikuk = strtotime("+10 months", strtotime($dt->tgl_diterima_kpp));
-            //KUP != keberatan 6bln, = keberatan 12bln
-            $d_kup = strtotime("+6 months", strtotime($dt->tgl_diterima_kpp));
-            $d_kupk = strtotime("+12 months", strtotime($dt->tgl_diterima_kpp));
             if ($keberatan != "") { // == keberatan
-                $jt_mr = date("d-m-Y", $d_mrk);
-                $jt_iku = date("d-m-Y", $d_ikuk);
-                $jt_kup = date("d-m-Y", $d_kupk);
+                $jt_mr = date("d-m-Y", strtotime($dt->MRK));
+                $jt_iku = date("d-m-Y", strtotime($dt->IKUK));
+                $jt_kup = date("d-m-Y", strtotime($dt->KUPK));
             } else { // !=keberatan
-                $jt_mr = date("d-m-Y", $d_mr);
-                $jt_iku = date("d-m-Y", $d_iku);
-                $jt_kup = date("d-m-Y", $d_kup);
+                $jt_mr = date("d-m-Y", strtotime($dt->MR));
+                $jt_iku = date("d-m-Y", strtotime($dt->IKU));
+                $jt_kup = date("d-m-Y", strtotime($dt->KUP));
             }
             $last_row++;
             $sheet->setCellValue('A' . $last_row, $dt->no_agenda);
